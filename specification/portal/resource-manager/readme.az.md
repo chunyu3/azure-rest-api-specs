@@ -22,3 +22,8 @@ python-sdk-output-folder: "$(az-output-folder)/azext_portal/vendored_sdks/portal
 #         required: true
 
 ```
+
+
+``` yaml $(az) && $(target-mode) == "core"
+compatible-level: 'track2'
+```
