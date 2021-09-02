@@ -82,3 +82,106 @@ directive:
     set:
       group: sshkey
 ```
+
+
+### -----start of auto generated cli-directive----- ###
+``` yaml $(az) && $(target-mode) == "core"
+cli:
+  cli-directive:
+    - where:
+        group: 'CapacityReservationGroups'
+        op: ListBySubscription|ListByResourceGroup|Get
+        apiVersion: '2021-04-01'
+      hidden: false
+    - where:
+        group: 'RestorePointCollections'
+        op: ListAll|List|Delete|Get|CreateOrUpdate
+        apiVersion: '2021-03-01'
+      hidden: false
+    - where:
+        group: 'CapacityReservations'
+        op: ListByCapacityReservationGroup|Get
+        apiVersion: '2021-04-01'
+      hidden: false
+    - where:
+        group: 'DiskAccesses'
+        op: ListPrivateEndpointConnections|DeleteAPrivateEndpointConnection
+        apiVersion: '2020-09-30'
+      hidden: false
+    - where:
+        group: 'DiskAccesses'
+        op: GetPrivateLinkResources
+        apiVersion: '2020-05-01'
+      hidden: false
+    - where:
+        group: 'RestorePoints'
+        op: Delete|Get|Create
+        apiVersion: '2021-03-01'
+      hidden: false
+    - where:
+        group: 'DiskRestorePoint'
+        op: Get
+        apiVersion: '2020-09-30'
+      hidden: false
+    - where:
+        group: 'DiskRestorePoint'
+        op: GrantAccess|RevokeAccess
+        apiVersion: '2020-12-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachines'
+        op: Reimage
+        apiVersion: '2018-06-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSets'
+        op: ConvertToSinglePlacementGroup
+        apiVersion: '2020-12-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSets'
+        op: ForceRecoveryServiceFabricPlatformUpdateDomainWalk|ReimageAll
+        apiVersion: '2018-10-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSets'
+        op: Redeploy
+        apiVersion: '2019-12-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMExtensions'
+        op: List|Get|CreateOrUpdate
+        apiVersion: '2019-07-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMs'
+        op: PerformMaintenance
+        apiVersion: '2019-12-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMs'
+        op: Redeploy
+        apiVersion: '2019-03-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMs'
+        op: ReimageAll
+        apiVersion: '2018-04-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMs'
+        op: RetrieveBootDiagnosticsData
+        apiVersion: '2020-06-01'
+      hidden: false
+    - where:
+        group: 'VirtualMachineScaleSetVMRunCommands'
+        op: List
+        apiVersion: '2020-12-01'
+      hidden: false
+    - where:
+        group: 'ContainerServices'
+        op: CreateOrUpdate
+        apiVersion: '2016-09-30'
+      hidden: false
+```
+### -----end of auto generated cli-directive----- ###
