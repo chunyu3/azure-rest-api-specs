@@ -4,8 +4,8 @@
  * Parameters used:
  *   isFullCompatible: true
  *   guessResourceKey: false
- * Version: 0.11.1
- * Date: 2025-05-29T07:57:57.762Z
+ * Version: 0.11.9
+ * Date: 2025-09-12T07:34:10.160Z
  */
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -31,7 +31,6 @@ using TypeSpec.Versioning;
 /**
  * REST API for Azure WebPubSub Service
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 @armProviderNamespace
 @service(#{ title: "WebPubSubManagementClient" })
 @versioned(Versions)
@@ -43,31 +42,9 @@ namespace Microsoft.SignalRService;
  */
 enum Versions {
   /**
-   * The 2025-01-01-preview API version.
+   * The 2024-03-01 API version.
    */
-  v2025_01_01_preview: "2025-01-01-preview",
+  v2024_03_01: "2024-03-01",
 }
 
-/**
- * This is the interface that implements the standard Azure Resource Manager operation that returns
- * all supported RP operations. You should have exactly one declaration for each
- * Azure Resource Manager service. It implements
- *   GET "/providers/Microsoft.ContosoProviderHub/operations"
- */
-interface Operations {
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  @tag("Operations")
-  @autoRoute
-  @doc("List the operations for the provider")
-  @segment("operations")
-  @get
-  @list
-  list(
-    ...ApiVersionParameter,
-
-    @path
-    @segment("providers")
-    @doc("The provider namespace (this parameter will not show up in operations).")
-    provider: "Microsoft.ThisWillBeReplaced",
-  ): ArmResponse<OperationList> | ErrorResponse;
-}
+interface Operations extends Azure.ResourceManager.Operations {}

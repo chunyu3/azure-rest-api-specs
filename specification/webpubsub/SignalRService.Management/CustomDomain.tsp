@@ -30,39 +30,37 @@ interface CustomDomains {
   /**
    * Get a custom domain.
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSubCustomDomains_Get")
   get is ArmResourceRead<CustomDomain>;
 
   /**
    * Create or update a custom domain.
    */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  #suppress "@azure-tools/typespec-azure-core/no-closed-literal-union" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  @Azure.Core.useFinalStateVia("azure-async-operation")
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes" "For backward compatibility"
+  @operationId("WebPubSubCustomDomains_CreateOrUpdate")
   createOrUpdate is ArmResourceCreateOrReplaceAsync<
     CustomDomain,
-    Response = ArmResourceCreatedResponse<
-      CustomDomain,
-      LroHeaders = ArmAsyncOperationHeader<FinalResult = CustomDomain>
-    > | ErrorResponse
+    Response = ArmResourceCreatedResponse<CustomDomain>
   >;
 
   /**
    * Delete a custom domain.
    */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "For backward compatibility"
+  @operationId("WebPubSubCustomDomains_Delete")
   delete is ArmResourceDeleteWithoutOkAsync<
     CustomDomain,
-    Response =
-      | ArmDeletedResponse
-      | ArmDeleteAcceptedLroResponse
-      | ArmDeletedNoContentResponse
-      | ErrorResponse
+    Response = ArmDeletedResponse | ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
   >;
 
   /**
    * List all custom domains.
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSubCustomDomains_List")
   list is ArmResourceListByParent<
     CustomDomain,
     Response = ArmResponse<CustomDomainList>

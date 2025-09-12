@@ -13,11 +13,13 @@ using TypeSpec.OpenAPI;
 
 namespace Microsoft.SignalRService;
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "For backward compatibility"
 interface WebPubSubOperationGroup {
   /**
    * Checks that the resource name is valid and is not already in use.
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSub_CheckNameAvailability")
   @autoRoute
   checkNameAvailability is ArmProviderActionSync<
     Request = NameAvailabilityParameters,
@@ -27,14 +29,15 @@ interface WebPubSubOperationGroup {
   >;
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "For backward compatibility"
 interface UsagesOperationGroup {
   /**
    * List resource usage quotas by location.
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("Usages_List")
   @autoRoute
   @get
-  @list
   @action("usages")
   list is ArmProviderActionSync<
     Response = SignalRServiceUsageList,

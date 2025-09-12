@@ -25,101 +25,86 @@ model SharedPrivateLinkResource
   >;
 }
 
-@armResourceOperations
-interface SharedPrivateLinkResourceOps
-  extends Azure.ResourceManager.Legacy.LegacyOperations<
-      {
-        ...ApiVersionParameter,
-        ...SubscriptionIdParameter,
-        ...ResourceGroupParameter,
-        ...Azure.ResourceManager.Legacy.Provider,
+alias SharedPrivateLinkResourceOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
 
-        /**
-         * The name of the resource.
-         */
-        @path
-        @segment("webPubSub")
-        @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
-        @minLength(3)
-        @maxLength(63)
-        resourceName: string,
+    /** The name of the resource. */
+    @path
+    @segment("webPubSub")
+    @key
+    @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
+    resourceName: string;
 
-        /**
-         * The name of the replica.
-         */
-        @path
-        @segment("replicas")
-        @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
-        @minLength(3)
-        @maxLength(63)
-        replicaName: string,
-      },
-      {
-        /**
-         * The name of the shared private link resource.
-         */
-        @path
-        @segment("sharedPrivateLinkResources")
-        @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
-        @minLength(3)
-        @maxLength(63)
-        sharedPrivateLinkResourceName: string,
-      }
-    > {}
+    /** The name of the replica. */
+    @path
+    @segment("replicas")
+    @key
+    @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
+    replicaName: string;
+  },
+  {
+    /** The name of the shared private link resource. */
+    @path
+    @segment("sharedPrivateLinkResources")
+    @key
+    @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
+    sharedPrivateLinkResourceName: string;
+  }
+>;
 
 @armResourceOperations
 interface SharedPrivateLinkResources {
   /**
    * Get the specified shared private link resource
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSubReplicaSharedPrivateLinkResources_Get")
   get is SharedPrivateLinkResourceOps.Read<SharedPrivateLinkResource>;
 
   /**
    * Create or update a shared private link resource
    */
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  #suppress "@azure-tools/typespec-azure-core/no-closed-literal-union" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSubReplicaSharedPrivateLinkResources_CreateOrUpdate")
   createOrUpdate is SharedPrivateLinkResourceOps.CreateOrUpdateAsync<SharedPrivateLinkResource>;
 
   /**
    * List shared private link resources
    */
+  #suppress "@azure-tools/typespec-azure-core/no-openapi" "non-standard operations"
+  @operationId("WebPubSubReplicaSharedPrivateLinkResources_List")
   list is SharedPrivateLinkResourceOps.List<
     SharedPrivateLinkResource,
     Response = ArmResponse<SharedPrivateLinkResourceList>
   >;
 }
-@armResourceOperations
-interface WebPubSubSharedPrivateLinkResourceOps
-  extends Azure.ResourceManager.Legacy.LegacyOperations<
-      {
-        ...ApiVersionParameter,
-        ...SubscriptionIdParameter,
-        ...ResourceGroupParameter,
-        ...Azure.ResourceManager.Legacy.Provider,
+alias WebPubSubSharedPrivateLinkResourceOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
 
-        /**
-         * The name of the resource.
-         */
-        @path
-        @segment("webPubSub")
-        @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
-        @minLength(3)
-        @maxLength(63)
-        resourceName: string,
-      },
-      {
-        /**
-         * The name of the shared private link resource.
-         */
-        @path
-        @segment("sharedPrivateLinkResources")
-        @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
-        @minLength(3)
-        @maxLength(63)
-        sharedPrivateLinkResourceName: string,
-      }
-    > {}
+    /** The name of the resource. */
+    @path
+    @segment("webPubSub")
+    @key
+    @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
+    resourceName: string;
+  },
+  {
+    /** The name of the shared private link resource. */
+    @path
+    @segment("sharedPrivateLinkResources")
+    @key
+    @pattern("^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$")
+    sharedPrivateLinkResourceName: string;
+  }
+>;
 
 @armResourceOperations
 interface WebPubSubSharedPrivateLinkResources {
@@ -136,15 +121,12 @@ interface WebPubSubSharedPrivateLinkResources {
   /**
    * Delete the specified shared private link resource
    */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  delete is WebPubSubSharedPrivateLinkResourceOps.DeleteSync<
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "For backward compatibility"
+  delete is WebPubSubSharedPrivateLinkResourceOps.DeleteWithoutOkAsync<
     SharedPrivateLinkResource,
-    Response =
-      | OkResponse
-      | ArmDeletedResponse
-      | ArmDeleteAcceptedLroResponse
-      | ArmDeletedNoContentResponse
+    Response = ArmDeletedResponse | ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
   >;
+
   /**
    * List shared private link resources
    */

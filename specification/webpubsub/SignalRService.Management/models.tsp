@@ -3,6 +3,11 @@ import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
+using TypeSpec.Rest;
+using TypeSpec.Http;
+using Azure.ResourceManager;
+using Azure.ResourceManager.Foundations;
+
 namespace Microsoft.SignalRService;
 
 /**
@@ -12,17 +17,13 @@ namespace Microsoft.SignalRService;
  */
 union WebPubSubSkuTier {
   string,
-
-  /** Free tier for WebPubSub service */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Free: "Free",
-
-  /** Basic tier for WebPubSub service (deprecated, use Standard instead) */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Basic: "Basic",
-
-  /** Standard tier for WebPubSub service */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Standard: "Standard",
-
-  /** Premium tier for WebPubSub service */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Premium: "Premium",
 }
 
@@ -31,32 +32,23 @@ union WebPubSubSkuTier {
  */
 union ProvisioningState {
   string,
-
-  /** Unknown provisioning state */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Unknown: "Unknown",
-
-  /** Resource successfully provisioned */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Succeeded: "Succeeded",
-
-  /** Resource provisioning failed */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Failed: "Failed",
-
-  /** Resource provisioning was canceled */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Canceled: "Canceled",
-
-  /** Resource provisioning is running */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Running: "Running",
-
-  /** Resource is being created */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Creating: "Creating",
-
-  /** Resource is being updated */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Updating: "Updating",
-
-  /** Resource is being deleted */
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Deleting: "Deleting",
-
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Moving: "Moving",
 }
 
@@ -65,13 +57,13 @@ union ProvisioningState {
  */
 union PrivateLinkServiceConnectionStatus {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Pending: "Pending",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Approved: "Approved",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Rejected: "Rejected",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Disconnected: "Disconnected",
 }
 
@@ -80,13 +72,13 @@ union PrivateLinkServiceConnectionStatus {
  */
 union CreatedByType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   User: "User",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Application: "Application",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   ManagedIdentity: "ManagedIdentity",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Key: "Key",
 }
 
@@ -95,15 +87,15 @@ union CreatedByType {
  */
 union SharedPrivateLinkResourceStatus {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Pending: "Pending",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Approved: "Approved",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Rejected: "Rejected",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Disconnected: "Disconnected",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Timeout: "Timeout",
 }
 
@@ -112,9 +104,9 @@ union SharedPrivateLinkResourceStatus {
  */
 union ACLAction {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Allow: "Allow",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Deny: "Deny",
 }
 
@@ -123,36 +115,14 @@ union ACLAction {
  */
 union WebPubSubRequestType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   ClientConnection: "ClientConnection",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   ServerConnection: "ServerConnection",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   RESTAPI: "RESTAPI",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Trace: "Trace",
-}
-
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-union ClientConnectionCountRuleDiscriminator {
-  string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  ThrottleByJwtSignatureRule: "ThrottleByJwtSignatureRule",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  ThrottleByUserIdRule: "ThrottleByUserIdRule",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  ThrottleByJwtCustomClaimRule: "ThrottleByJwtCustomClaimRule",
-}
-
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-union ClientTrafficControlRuleDiscriminator {
-  string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  TrafficThrottleByJwtSignatureRule: "TrafficThrottleByJwtSignatureRule",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  TrafficThrottleByUserIdRule: "TrafficThrottleByUserIdRule",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  TrafficThrottleByJwtCustomClaimRule: "TrafficThrottleByJwtCustomClaimRule",
 }
 
 /**
@@ -160,9 +130,9 @@ union ClientTrafficControlRuleDiscriminator {
  */
 union ServiceKind {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   WebPubSub: "WebPubSub",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   SocketIO: "SocketIO",
 }
 
@@ -171,11 +141,11 @@ union ServiceKind {
  */
 union ManagedIdentityType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   None: "None",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   SystemAssigned: "SystemAssigned",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   UserAssigned: "UserAssigned",
 }
 
@@ -184,23 +154,23 @@ union ManagedIdentityType {
  */
 union UpstreamAuthType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   None: "None",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   ManagedIdentity: "ManagedIdentity",
 }
 
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
 union EventListenerFilterDiscriminator {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   EventName: "EventName",
 }
 
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
 union EventListenerEndpointDiscriminator {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   EventHub: "EventHub",
 }
 
@@ -209,11 +179,11 @@ union EventListenerEndpointDiscriminator {
  */
 union KeyType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Primary: "Primary",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Secondary: "Secondary",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Salt: "Salt",
 }
 
@@ -222,11 +192,11 @@ union KeyType {
  */
 union ScaleType {
   string,
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   None: "None",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Manual: "Manual",
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   Automatic: "Automatic",
 }
 
@@ -295,7 +265,6 @@ model OperationProperties {
   serviceSpecification?: ServiceSpecification;
 }
 
-model OperationList is Azure.Core.Page<Operation>;
 /**
  * An object that describes a specification.
  */
@@ -439,13 +408,11 @@ model NameAvailability {
 /**
  * Object that includes an array of the resource usages and a possible link for next set.
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model SignalRServiceUsageList is Azure.Core.Page<SignalRServiceUsage>;
 
 /**
  * Object that describes a specific usage of the resources.
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model SignalRServiceUsage {
   /**
    * Fully qualified ARM resource id
@@ -476,7 +443,6 @@ model SignalRServiceUsage {
 /**
  * Localizable String object containing the name and a localized value.
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model SignalRServiceUsageName {
   /**
    * The identifier of the usage.
@@ -550,7 +516,6 @@ model WebPubSubProperties {
   /**
    * The publicly accessible IP of the resource.
    */
-  #suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
   @visibility(Lifecycle.Read)
   externalIP?: string;
 
@@ -616,13 +581,7 @@ model WebPubSubProperties {
   /**
    * Network ACLs for the resource
    */
-  #suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
   networkACLs?: WebPubSubNetworkACLs;
-
-  /**
-   * Application firewall settings for the resource
-   */
-  applicationFirewall?: ApplicationFirewallSettings;
 
   /**
    * Enable or disable public network access. Default to "Enabled".
@@ -636,14 +595,14 @@ model WebPubSubProperties {
    * Enable or disable local auth with AccessKey
    * When set as true, connection with AccessKey=xxx won't work.
    */
-  disableLocalAuth?: boolean = false;
+  disableLocalAuth?: boolean;
 
   /**
    * DisableLocalAuth
    * Enable or disable aad auth
    * When set as true, connection with AuthType=aad won't work.
    */
-  disableAadAuth?: boolean = false;
+  disableAadAuth?: boolean;
 
   /**
    * Enable or disable the regional endpoint. Default to "Enabled".
@@ -662,7 +621,6 @@ model WebPubSubProperties {
   /**
    * SocketIO settings for the resource
    */
-  #suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
   socketIO?: WebPubSubSocketIOSettings;
 }
 
@@ -750,12 +708,6 @@ model SharedPrivateLinkResourceProperties {
   requestMessage?: string;
 
   /**
-   * A list of FQDNs for third party private link service
-   */
-  @OpenAPI.extension("x-ms-identifiers", #[])
-  fqdns?: string[];
-
-  /**
    * Status of the shared private link resource
    */
   @visibility(Lifecycle.Read)
@@ -769,7 +721,7 @@ model WebPubSubTlsSettings {
   /**
    * Request client certificate during TLS handshake if enabled. Not supported for free tier. Any input will be ignored for free tier.
    */
-  clientCertEnabled?: boolean = false;
+  clientCertEnabled?: boolean;
 }
 
 /**
@@ -844,7 +796,6 @@ model ResourceLogCategory {
 /**
  * Network ACLs for the resource
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model WebPubSubNetworkACLs {
   /**
    * Azure Networking ACL Action.
@@ -865,7 +816,6 @@ model WebPubSubNetworkACLs {
   /**
    * IP rules for filtering public traffic
    */
-  @maxItems(30)
   @OpenAPI.extension("x-ms-identifiers", #[])
   ipRules?: IPRule[];
 }
@@ -873,7 +823,6 @@ model WebPubSubNetworkACLs {
 /**
  * Network ACL
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model NetworkACL {
   /**
    * Allowed request types. The value can be one or more of: ClientConnection, ServerConnection, RESTAPI.
@@ -891,8 +840,7 @@ model NetworkACL {
 /**
  * ACL for a private endpoint
  */
-#suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "For backward compatibility"
 model PrivateEndpointACL extends NetworkACL {
   /**
    * Name of the private endpoint connection
@@ -916,53 +864,8 @@ model IPRule {
 }
 
 /**
- * Application firewall settings for the resource
- */
-model ApplicationFirewallSettings {
-  /**
-   * Rules to control the client connection count
-   */
-  @maxItems(10)
-  @OpenAPI.extension("x-ms-identifiers", #[])
-  clientConnectionCountRules?: ClientConnectionCountRule[];
-
-  /**
-   * Rules to control the client traffic
-   */
-  @maxItems(10)
-  @OpenAPI.extension("x-ms-identifiers", #[])
-  clientTrafficControlRules?: ClientTrafficControlRule[];
-
-  /**
-   * Config to control the client connection lifetime in seconds, can be set to 0 to disable the config
-   */
-  @minValue(0)
-  @maxValue(604800)
-  maxClientConnectionLifetimeInSeconds?: int64;
-}
-
-/**
- * A base class for client connection count rules
- */
-@discriminator("type")
-model ClientConnectionCountRule {
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  type: ClientConnectionCountRuleDiscriminator;
-}
-
-/**
- * A base class for client traffic control rules
- */
-@discriminator("type")
-model ClientTrafficControlRule {
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
-  type: ClientTrafficControlRuleDiscriminator;
-}
-
-/**
  * SocketIO settings for the resource
  */
-#suppress "@azure-tools/typespec-azure-core/casing-style" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
 model WebPubSubSocketIOSettings {
   /**
    * The service mode of Web PubSub for Socket.IO. Values allowed:
@@ -984,7 +887,7 @@ model ManagedIdentity {
   /**
    * Get or set the user assigned identities
    */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-no-record" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-no-record" "For backward compatibility"
   userAssignedIdentities?: Record<UserAssignedIdentityProperty>;
 
   /**
@@ -1097,7 +1000,7 @@ model WebPubSubHubList is Azure.Core.Page<WebPubSubHub>;
 /**
  * Properties of a hub.
  */
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" "For backward compatibility"
 model WebPubSubHubProperties {
   /**
    * Event handler of a hub.
@@ -1131,12 +1034,10 @@ model WebPubSubHubProperties {
  * Properties of event handler.
  */
 model EventHandler {
-  @doc("""
-    Gets or sets the URL template for the event handler. The actual URL is calculated when the corresponding event is triggered. 
-    The template supports predefined parameters syntax: `{event}`, `{hub}`, and KeyVault reference syntax `{@Microsoft.KeyVault(SecretUri=_your_secret_identifier_)}` 
-    For example, if the template is `http://example.com/api/{event}`, when `connect` event is triggered, a POST request will be sent to the URL `http://example.com/chat/api/connect`.
-    Note: Parameters are not allowed in the hostname of the URL, and curly brackets `{}` are reserved for parameter syntax only. If your URL path contains literal curly brackets, please URL-encode them to ensure proper handling.
-    """)
+  /**
+   * Gets or sets the EventHandler URL template. You can use a predefined parameter {hub} and {event} inside the template, the value of the EventHandler URL is dynamically calculated when the client request comes in.
+   * For example, UrlTemplate can be `http://example.com/api/{hub}/{event}`. The host part can't contains parameters.
+   */
   urlTemplate: string;
 
   /**
@@ -1206,7 +1107,7 @@ model EventListener {
  */
 @discriminator("type")
 model EventListenerFilter {
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   type: EventListenerFilterDiscriminator;
 }
 
@@ -1215,7 +1116,7 @@ model EventListenerFilter {
  */
 @discriminator("type")
 model EventListenerEndpoint {
-  #suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
   type: EventListenerEndpointDiscriminator;
 }
 
@@ -1226,25 +1127,21 @@ model WebPubSubKeys {
   /**
    * The primary access key.
    */
-  @secret
   primaryKey?: string;
 
   /**
    * The secondary access key.
    */
-  @secret
   secondaryKey?: string;
 
   /**
    * Connection string constructed via the primaryKey
    */
-  @secret
   primaryConnectionString?: string;
 
   /**
    * Connection string constructed via the secondaryKey
    */
-  @secret
   secondaryConnectionString?: string;
 }
 
@@ -1262,12 +1159,14 @@ model PrivateLinkResourceList is Azure.Core.Page<PrivateLinkResource>;
 /**
  * Private link resource
  */
-#suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "For backward compatibility"
 model PrivateLinkResource
   extends Azure.ResourceManager.CommonTypes.ProxyResource {
   /**
    * Private link resource properties
    */
+  #suppress "@azure-tools/typespec-azure-core/no-private-usage" "For backward compatibility"
+  @Azure.ResourceManager.Private.conditionalClientFlatten
   properties?: PrivateLinkResourceProperties;
 }
 
@@ -1344,10 +1243,10 @@ model RegenerateKeyParameters {
   keyType?: KeyType;
 }
 
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
 model ReplicaList is Azure.Core.Page<Replica>;
 
-#suppress "@azure-tools/typespec-azure-core/documentation-required" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+#suppress "@azure-tools/typespec-azure-core/documentation-required" "For backward compatibility"
 model ReplicaProperties {
   /**
    * Provisioning state of the resource.
@@ -1378,24 +1277,7 @@ model SharedPrivateLinkResourceList
 /**
  * The list skus operation response
  */
-model SkuList {
-  /**
-   * The list of skus available for the resource.
-   */
-  @visibility(Lifecycle.Read)
-  @OpenAPI.extension(
-    "x-ms-identifiers",
-    #["resourceType", "/sku/name", "/sku/tier"]
-  )
-  value?: Sku[];
-
-  /**
-   * The URL the client should use to fetch the next page (per server side paging).
-   * It's null for now, added for future use.
-   */
-  @visibility(Lifecycle.Read)
-  nextLink?: string;
-}
+model SkuList is Azure.Core.Page<Sku>;
 
 /**
  * Describes an available sku."
@@ -1410,7 +1292,6 @@ model Sku {
   /**
    * The billing information of the resource.
    */
-  #suppress "@azure-tools/typespec-client-generator-core/property-name-conflict" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
   @visibility(Lifecycle.Read)
   sku?: ResourceSku;
 
@@ -1463,7 +1344,7 @@ model SkuCapacity {
  */
 model EventHubEndpoint extends EventListenerEndpoint {
   /**
-   * The fully qualified namespace name of the Event Hub resource.
+   * The fully qualified namespace name of the Event Hub resource. For example, "example.servicebus.windows.net".
    */
   fullyQualifiedNamespace: string;
 
@@ -1496,116 +1377,3 @@ model EventNameFilter extends EventListenerFilter {
 
   type: "EventName";
 }
-
-/**
- * Throttle the client connection by a custom JWT claim
- */
-model ThrottleByJwtCustomClaimRule extends ClientConnectionCountRule {
-  /**
-   * The name of the claim in the JWT token. The client connection with the same claim value will be aggregated. If the claim is not found in the token, the connection will be allowed.
-   */
-  claimName: string;
-
-  /**
-   * Maximum connection count allowed for the same Jwt claim value. Clients with the same Jwt claim will get rejected if the connection count exceeds this value. Default value is 20.
-   */
-  @minValue(0)
-  @maxValue(2147483647)
-  maxCount?: int32 = 20;
-
-  type: "ThrottleByJwtCustomClaimRule";
-}
-
-/**
- * Throttle the client connection by the JWT signature
- */
-model ThrottleByJwtSignatureRule extends ClientConnectionCountRule {
-  /**
-   * Maximum connection count allowed for the same JWT signature. Clients with the same JWT signature will get rejected if the connection count exceeds this value. Default value is 20.
-   */
-  @minValue(0)
-  @maxValue(2147483647)
-  maxCount?: int32 = 20;
-
-  type: "ThrottleByJwtSignatureRule";
-}
-
-/**
- * Throttle the client connection by the user ID
- */
-model ThrottleByUserIdRule extends ClientConnectionCountRule {
-  /**
-   * Maximum connection count allowed for the same user ID. Clients with the same user ID will get rejected if the connection count exceeds this value. Default value is 20.
-   */
-  @minValue(0)
-  @maxValue(2147483647)
-  maxCount?: int32 = 20;
-
-  type: "ThrottleByUserIdRule";
-}
-
-/**
- * Throttle the client traffic by a custom JWT claim
- */
-model TrafficThrottleByJwtCustomClaimRule extends ClientTrafficControlRule {
-  /**
-   * The name of the claim in the JWT token. The message bytes with the same claim value will be aggregated. If the claim is not found in the token, the rule will be skipped.
-   */
-  claimName: string;
-
-  /**
-   * Maximum accumulated inbound message bytes allowed for the same JWT signature within a time window. Clients with the same JWT claim will get disconnected if the message bytes exceeds this value. Default value is 1GB.
-   */
-  @minValue(0)
-  maxInboundMessageBytes?: int64;
-
-  /**
-   * The aggregation window for the message bytes. The message bytes will be aggregated in this window and be reset after the window. Default value is 60 seconds.
-   */
-  @maxValue(3600)
-  @minValue(10)
-  aggregationWindowInSeconds?: int32 = 60;
-
-  type: "TrafficThrottleByJwtCustomClaimRule";
-}
-
-/**
- * Throttle the client traffic by the JWT signature
- */
-model TrafficThrottleByJwtSignatureRule extends ClientTrafficControlRule {
-  /**
-   * Maximum accumulated inbound message bytes allowed for the same JWT signature within a time window. Clients with the same JWT signature will get disconnected if the message bytes exceeds this value. Default value is 1GB.
-   */
-  @minValue(0)
-  maxInboundMessageBytes?: int64;
-
-  /**
-   * The aggregation window for the message bytes. The message bytes will be aggregated in this window and be reset after the window. Default value is 60 seconds.
-   */
-  @maxValue(3600)
-  @minValue(10)
-  aggregationWindowInSeconds?: int32 = 60;
-
-  type: "TrafficThrottleByJwtSignatureRule";
-}
-
-/**
- * Throttle the client traffic by the user ID
- */
-model TrafficThrottleByUserIdRule extends ClientTrafficControlRule {
-  /**
-   * Maximum accumulated inbound message bytes allowed for the same user ID within a time window. Clients with the same user ID will get disconnected if the message bytes exceeds this value. Default value is 1GB.
-   */
-  @minValue(0)
-  maxInboundMessageBytes?: int64;
-
-  /**
-   * The aggregation window for the message bytes. The message bytes will be aggregated in this window and be reset after the window. Default value is 60 seconds.
-   */
-  @maxValue(3600)
-  @minValue(10)
-  aggregationWindowInSeconds?: int32 = 60;
-
-  type: "TrafficThrottleByUserIdRule";
-}
-@@OpenAPI.extension(OperationList.value, "x-ms-identifiers", #["name"]);

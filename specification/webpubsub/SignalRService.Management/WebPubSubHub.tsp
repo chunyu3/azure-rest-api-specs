@@ -40,14 +40,10 @@ interface WebPubSubHubs {
   /**
    * Delete a hub setting.
    */
-  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "FIXME: Update justification, follow aka.ms/tsp/conversion-fix for details"
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes" "For backward compatibility"
   delete is ArmResourceDeleteWithoutOkAsync<
     WebPubSubHub,
-    Response =
-      | OkResponse
-      | ArmDeletedResponse
-      | ArmDeleteAcceptedLroResponse
-      | ArmDeletedNoContentResponse
+    Response = ArmDeletedResponse | ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
   >;
 
   /**
