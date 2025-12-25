@@ -45,8 +45,9 @@ Call the tool:
   - intent
   - resource/interface/operation names
   - key constraints / keywords
+- use user request (verbatim) as parameter
 
-Store the value of 'context' property in the tool output as **RETRIEVED_CONTEXT**.
+Store the value of 'context' property in the tool output verbatim as **RETRIEVED_CONTEXT**.
 
 ### Step C — Generate Plan With Context (planning only; no code output yet)
 Use the following **PLAN_GENERATION_PROMPT** verbatim as your internal prompt to the model when producing the plan.
@@ -58,7 +59,7 @@ You are an Azure TypeSpec authoring assistant. Produce a concrete execution plan
 USER_REQUEST:
 {USER_REQUEST}
 
-RETRIEVED_CONTEXT (authoritative):
+RETRIEVED_CONTEXT (verbatim):
 {RETRIEVED_CONTEXT}
 
 WORKSPACE_HINTS (optional file paths/snippets if available):
@@ -91,7 +92,7 @@ If anything is missing:
 Output format:
 1) Clarifying Questions (if needed, max 6)
 2) Understanding (1–2 sentences restating scope)
-3) Key guidance to follow (bullet list). For each item, cite a reference from RETRIEVED_CONTEXT (title/section/link).
+3) Key guidance to follow (bullet list). For each item, cite a reference from RETRIEVED_CONTEXT in this exact format:document_title with document_link if any and followup (document_source).
 4) Step-by-step plan (numbered):
    - Identify target file(s)/folders
    - Exact kind of changes to make (operations/models/decorators/versioning)
