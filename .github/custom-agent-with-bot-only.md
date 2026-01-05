@@ -7,12 +7,10 @@
    │  version 2025-12-09 │                       │                      │
    │  to my project"     │                       │                      │
    │────────────────────>│                       │                      │
-   │                     │                       │                      │
    │                     │────┐                  │                      │
-   │                     │    │ detect scenario  │                      │
-   │                     │<───┘                  │                      │
+   │                     │    │ retrieve required│                      │
+   │                     │<───┘ information      │                      │
    │                     │                       │                      │
-   │                     │ (if: normal authoring)│                      │
    │                     │ Request versioning    │                      │
    │                     │ info                  │                      │
    │                     │──────────────────────>│                      │
