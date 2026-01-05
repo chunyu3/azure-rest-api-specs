@@ -1,6 +1,6 @@
 ┌──────┐          ┌─────────────┐          ┌───────────┐          ┌───────────┐          ┌────────────────┐
-│ User │          │ custom agent│          │ azsdk     │          │ AI search │          │ llms.txt       │ 
-│      │          │ Copilot     │          │ MCP       │          │           │          │ web fetch tool │
+│ User │          │ custom agent│          │ azsdk     │          │ Knowledge │          │ llms.txt       │ 
+│      │          │ Copilot     │          │ MCP       │          │ base (bot)│          │ web fetch tool │
 └──┬───┘          └──────┬──────┘          └─────┬─────┘          └─────┬─────┘          └──────┬─────────┘
    │                     │                       │                      │                        │
    │ "Add new preview    │                       │                      │                        │
@@ -20,15 +20,11 @@
    │                     │                       │ Search request       │                        │
    │                     │                       │─────────────────────>│                        │
    │                     │                       │                      │                        │
-   │                     │                       │ Versioning knowledge │                        │
+   │                     │                       │ Versioning solution  │                        │
    │                     │                       │<─────────────────────│                        │
    │                     │                       │                      │                        │
-   │                     │ Versioning knowledge  │                      │                        │
+   │                     │ Versioning solution   │                      │                        │
    │                     │<──────────────────────│                      │                        │
-   │                     │                       │                      │                        │
-   │                     │────┐                  │                      │                        │
-   │                     │    │generate solution │                      │                        │
-   │                     │<───┘  (llm call)      │                      │                        │
    │                     │────┐                  │                      │                        │
    │                     │    │ Make edits       │                      │                        │
    │                     │<───┘                  │                      │                        │
@@ -55,7 +51,7 @@
    │                     │                       │                      │                        │
    │                     │────┐                  │                      │                        │
    │                     │    │generate solution │                      │                        │
-   │                     │<───┘   (llm call)     │                      │                        │
+   │                     │<───┘  (llm call)      │                      │                        │
    │                     │────┐                  │                      │                        │
    │                     │    │ Make edits       │                      │                        │
    │                     │<───┘                  │                      │                        │
