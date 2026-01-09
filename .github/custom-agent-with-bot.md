@@ -7,6 +7,9 @@
    │  version 2025-12-09 │                       │                      │                        │
    │  to my project"     │                       │                      │                        │
    │────────────────────>│                       │                      │                        │
+   │                     │────┐                  │                      │
+   │                     │    │ retrieve required│                      │
+   │                     │<───┘ information      │                      │
    │                     │                       │                      │                        │
    │                     │────┐                  │                      │                        │
    │                     │    │ detect scenario  │                      │                        │
@@ -37,6 +40,9 @@
    │  for dotnet sdk"    │                       │                      │                        │
    │────────────────────>│                       │                      │                        │
    │                     │                       │                      │                        │
+   │                     │────┐                  │                      │
+   │                     │    │ retrieve required│                      │
+   │                     │<───┘ information      │                      │
    │                     │────┐                  │                      │                        │
    │                     │    │ detect scenario  │                      │                        │
    │                     │<───┘                  │                      │                        │
