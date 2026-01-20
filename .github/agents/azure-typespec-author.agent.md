@@ -40,7 +40,7 @@ When encountering a TypeSpec-related task, follow this workflow (must follow exa
 To retrieve the solution, run the following command **from the workspace root directory** in their terminal:
 
 ```cmd
-   D:\\dev\\azure-sdk-tools\\artifacts\\bin\\Azure.Sdk.Tools.Cli\\Debug\\net8.0\\azsdk typespec retrieve-solution --request "<request>" --additional-information "<additionalInformation>" > retrieve-solution.md
+   D:\\dev\\azure-sdk-tools\\artifacts\\bin\\Azure.Sdk.Tools.Cli\\Debug\\net8.0\\azsdk typespec retrieve-solution --request "<request>" --additional-information "<additionalInformation>"
 ```
 
 - use user request (verbatim) as parameter `request`
@@ -50,12 +50,9 @@ open the terminal and copy the command in the terminal
 
 ### Step 3 — Apply Changes (edits)
 
-When a solution file exists in the workspace (e.g.
-`<workspace-root>/retrieve-solution.md` or .json):
-
 You MUST:
-1. Read the solution file `<workspace-root>/retrieve-solution.md` using the file read tool.
-2. Treat the file content as the single source of truth.
+1. Read the solution from the output.
+2. Treat the content as the single source of truth.
 3. Do NOT invent steps not present in the solution.
 4. Apply the solution by editing the relevant TypeSpec (.tsp) files.
 5. Explain each change and reference the solution section it came from.
