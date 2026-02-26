@@ -1,7 +1,7 @@
 ---
 name: azure-typespec-author
 description: 'Author and update Azure TypeSpec (.tsp) safely by retrieving authoritative solution with azsdk_typespec_generate_authoring_plan, then applying minimal changes and validating. Triggers for any TypeSpec related tasks, including: adding new API versions (preview or stable), creating or modifying ARM resources or data-plane services, defining models/enums/unions, adding operations to resources or interfaces, updating TypeSpec definitions for Azure services, resolving SDk breaking changes, or fixing TypeSpec compilation errors. Keywords: TypeSpec, tsp, ARM, resource-manager, data-plane, API version, preview version, stable version, Azure resource, Azure service, resource provider.'
-tools: ['edit', 'search/readFile', 'azure-sdk-mcp/azsdk_typespec_generate_authoring_plan']
+tools: ['execute', 'read/readFile', 'edit', 'azure-sdk-mcp/azsdk_typespec_generate_authoring_plan']
 ---
 
 ## Agent Identity
@@ -39,6 +39,14 @@ When encountering a TypeSpec-related task, follow this workflow (must follow exa
 
 collect additional information for following special cases:
 
+**Special case — verify and resolve Go SDK breaking changes**
+
+- If the user request involves **TypeSpec changes**, **SDK compatibility**, or **mentions Go / arm / breaking change**:
+     - You **MUST** follow the `detect-go-sdk-breaking-change` skill (`.github/skills/detect-go-sdk-breaking-change/SKILL.md`) to identify the GO sdk breaking changes
+     - Produce a section titled **“Detected Go SDK Breaking Changes”**.
+     - Rewrite the original user request by **merging in the detected breaking changes**.
+     - Treat the rewritten request as the **new canonical request** for all following steps.
+
 5. Do **not** proceed to planning or file edits until this step is complete.
 
 
@@ -65,6 +73,9 @@ Only after a grounded plan is produced:
 ### Step 4 — Validate
 - Run TypeSpec compilation and any repo validations if available.
 - If validation fails, fix forward with minimal changes.
+- You **MUST** follow the `detect-go-sdk-breaking-change` skill to detect SDK breadking change:
+    - Use `../skills/detect-go-sdk-breaking-change/SKILL.md` as the execution instructions.
+    - Produce a section titled **“Detected Go SDK Breaking Changes”**.
 
 ### Step 5 — Summarize
 Return:
