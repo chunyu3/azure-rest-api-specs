@@ -5,9 +5,10 @@ Complete all sub-steps to collect required information before proceeding to impl
 | Sub-step | Goal | Mandatory? |
 |----------|------|------------|
 | [1.1 Analyze Project](#step-11-analyze-the-typespec-project) | Gather project inputs | Yes |
+| [1.1.1 Detect Go SDK Breaking Changes](#step-111-detect-go-sdk-breaking-changes) | Identify Go breaking-change list (for "resolve Go" requests) | Yes (when requested) |
 | [1.2 Identify Case](#step-12-identify-supported-case) | Match request to a supported case | Yes |
 | [1.3 Display Results](#step-13-display-analysis-results) | Show analysis summary to user | Yes |
-| [1.4 Case-Specific Intake](#step-14-case-specific-intake) | Collect additional inputs per case | Only if matched |
+| [1.4 Case-Specific Questions](#step-14-case-specific-intake-questions) | Collect additional inputs per case | Only if matched |
 | [1.5 Confirm & Proceed](#step-15-summary-and-confirmation) | Confirm collected information | Yes |
 
 ---
@@ -30,11 +31,98 @@ Collect the following inputs. Ask **up to 6 concise questions** for any that are
 | 8 | **Target resource/interface/operation** | Resource or operation name (if known) |
 | 9 | **Constraints** | Breaking-change limits, naming rules, emitter targets, etc. |
 
+## Step 1.1.1: Detect Go SDK Breaking Changes
+
+Run this step during intake when the user asks to **resolve Go SDK breaking changes** (or otherwise requests Go breaking-change detection).
+
+**Gate**: If the user request is to **resolve Go SDK breaking changes**, you MUST complete Step 1.1.1 **before** presenting the Step 1.3 analysis output.
+
+**Goal**: Produce a concrete list of Go SDK breaking changes so subsequent authoring is scoped to exactly what needs to be fixed.
+
+**How to run**:
+
+Before running detection, ask the minimum questions to confirm required inputs:
+ 
+### Questions
+
+```
+1. Which language SDK?
+   □ Go
+   □ JavaScript
+   □ Java
+   □ .NET
+
+2. What is the language SDK repo root path on disk?
+   Example (Windows): C:\dev\azure-sdk-for-go
+
+3. What is the spec repo root path on disk?
+   Example (Windows): C:\dev\azure-rest-api-specs
+
+4. What is the TypeSpec project path (the folder that contains tspconfig.yaml)?
+   Example (relative to azure-rest-api-specs): specification\webpubsub\resource-manager\Microsoft.SignalRService\SignalRService
+
+```
+
+### Data Collected
+```json
+{
+   "goSdkRepoRoot": "[user input of Question #2]",
+   "specRepoRoot": "[user input of Question #3]",
+   "typeSpecProjectPath": "[user input of Question #4]",
+}
+```
+
+- Follow the `detect-go-sdk-breaking-change` skill (`.github/skills/detect-go-sdk-breaking-change/SKILL.md`).
+
+### Prompt Template (copy/paste)
+
+Use this when you already collected answers to the Questions above and want to run the skill with those parameters (without re-asking).
+
+```
+Run the skill: detect-go-sdk-breaking-change.
+
+Use the following inputs (collected from previous questions; do not ask again):
+- goSdkRoot: <PASTE goSdkRepoRoot HERE>
+- specsRoot: <PASTE specRepoRoot HERE>
+- typeSpecProjectPath: <PASTE typeSpecProjectPath HERE>
+- tspConfigRelativePath: <typeSpecProjectPath>\tspconfig.yaml
+
+Output:
+- Return a concise list formatted exactly like:
+   ### Breaking Changes
+   - ...
+   ### Features Added
+   - ...
+```
+
+Notes:
+- `typeSpecProjectPath` must be the folder containing `tspconfig.yaml`.
+- In JSON, Windows paths must escape backslashes (use `\\`). If you use YAML instead, you can use normal `C:\dev\...`.
+
+**If prerequisites are missing** (no local `azure-sdk-for-go` clone / no Go toolchain), the user cancels the generation, or detection otherwise fails (generator error, changelog not produced, etc.):
+
+- Ask the user to paste the Go changelog excerpt for the package: the first `## <version>` section, including both `### Breaking Changes` and `### Features Added`.
+- Proceed using that pasted content as the **Detected Go SDK Breaking Changes** list in Step 1.3.
+
+Suggested prompt to the user (copy/paste):
+
+```
+I couldn't complete automatic Go breaking-change detection (missing prerequisites / generation failed / cancelled).
+
+Please paste the FIRST `## <version>` section from the generated Go package changelog,
+including both `### Breaking Changes` and `### Features Added`.
+
+For WebPubSub ARM, it is typically at:
+   <go-sdk-root>\sdk\resourcemanager\webpubsub\armwebpubsub\CHANGELOG.md
+```
+
 ---
 
 ## Step 1.2: Identify Supported Case
 
-Match the user's request to a supported case:
+**Goal**: Determine which authoring case the user needs.
+
+Check whether the user's request falls into one of the supported cases:
 
 | Case | Name | Description |
 |------|------|-------------|
@@ -71,6 +159,14 @@ Intent: [add/modify/fix]
 Target: [resource/operation if known]
 Constraints: [if any]
 Selected Case: [Case Name or "None"]
+
+Detected Go SDK Breaking Changes: [Include when Step 1.1.1 was run]
+   ### Breaking Changes
+   - [Breaking change #1]
+   - [Breaking change #2]
+   ### Features Added
+   - [New Feature #1]
+   - [New Feature #2]
 ```
 
 ---
@@ -116,7 +212,6 @@ Selected Case: [Case Name or "None"]
 **Key rule:** Top-level tracked resources MUST have `listByResourceGroup` and `listBySubscription`.
 
 ---
-
 ### Case 4: Add Operations
 
 **Required information:**
@@ -179,6 +274,10 @@ Selected Case: [Case Name or "None"]
 - Decorator parameters/values
 
 **Key rule:** If using versioning decorators (`@added`, `@removed`, `@renamedFrom`, etc.), ensure `@typespec/versioning` is imported.
+
+### Verify and resolve Go SDK breaking changes
+
+- This is handled during intake in **Step 1.1.1** when the user asks to resolve Go SDK breaking changes.
 
 ---
 

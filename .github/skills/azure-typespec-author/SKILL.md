@@ -1,6 +1,6 @@
 ---
 name: azure-typespec-author
-description: "Author or modify Azure TypeSpec API specifications in the azure-rest-api-specs repository. USE FOR: Any task that creates, modifies, or troubleshoots .tsp files or TypeSpec API specifications — including but not limited to API versioning, ARM or data-plane resource definitions (tracked, proxy, extension, child resources), resource operations (CRUD, PATCH, custom actions, async/LRO), models, enums, unions, properties, decorators, constraints, and swagger-to-TypeSpec conversion. DO NOT USE FOR: SDK generation from TypeSpec, releasing SDK packages, single MCP tool calls that do not require multi-step workflows. TOOLS/COMMANDS: azsdk_typespec_generate_authoring_plan, azsdk_run_typespec_validation"
+description: "Author or modify Azure TypeSpec API specifications in the azure-rest-api-specs repository. USE FOR: Any task that creates, modifies, or troubleshoots .tsp files or TypeSpec API specifications — including but not limited to API versioning, ARM or data-plane resource definitions (tracked, proxy, extension, child resources), resource operations (CRUD, PATCH, custom actions, async/LRO), models, enums, unions, properties, decorators, constraints, and swagger-to-TypeSpec conversion. Resolve SDK breaking changes for a typespec project. Resolve TypeSpec compiler errors. DO NOT USE FOR: SDK generation from TypeSpec, releasing SDK packages, single MCP tool calls that do not require multi-step workflows. TOOLS/COMMANDS: azsdk_typespec_generate_authoring_plan, azsdk_run_typespec_validation"
 ---
 
 # Azure TypeSpec Author
@@ -52,7 +52,7 @@ description: "Author or modify Azure TypeSpec API specifications in the azure-re
 | 1 | [Intake & Clarification](#step-1-intake--clarification) | `references/intake-arm.md` | All inputs collected + analysis displayed |
 | 2 | [Retrieve Solution](#step-2-retrieve-solution) | `azsdk_typespec_generate_authoring_plan` | Grounded plan returned |
 | 3 | [Apply Changes](#step-3-apply-changes) | Editor | User confirms uncertainties |
-| 4 | [Validate](#step-4-validate) | `azsdk_run_typespec_validation` | Compilation passes |
+| 4 | [Validate](#step-4-validate) | `azsdk_run_typespec_validation` | Compilation passes + request satisfied |
 | 5 | [Summarize](#step-5-summarize) | — | Summary displayed to user |
 | 6 | [Next Steps](#step-6-next-steps) | `references/next-steps-arm.md` | Follow-up actions presented |
 
@@ -92,11 +92,39 @@ Only after a grounded plan is produced:
 
 ### Step 4: Validate
 
-Invoke `azsdk_run_typespec_validation` MCP tool to run validation.
+This step has **two parts**:
 
-- If validation **passes** → proceed to Step 5
-- If validation **fails** → fix forward with minimal changes and re-validate
-- Do NOT skip validation even if the change appears trivial
+#### Part 1 — The two validation actions to take
+
+1. **Run TypeSpec validation (tool-driven)**
+   - Invoke `azsdk_run_typespec_validation` to run TypeSpec compilation + lint validation.
+   - Follow the **Validation plan** returned by `azsdk_typespec_generate_authoring_plan` (if it calls out specific commands, project roots, or checks, use those).
+
+   **MANDATORY: Show what you are validating**
+   - In chat, explicitly state the validation plan you are following, including:
+     - The TypeSpec project root path being validated
+     - The exact tool or command being run (prefer `azsdk_run_typespec_validation`; if you also run `tsp compile`, say so)
+     - What the validation is expected to prove (compile success, linter/ruleset success, emitter output presence, etc.)
+   - If you retry validation (e.g., transient tool failure), explain why you retried and which run’s result you are reporting.
+   - If the authoring plan requires checking generated OpenAPI output, show **where** you checked (file path(s) under the project) and **what** you looked for (e.g., presence of specific parameters on a specific operation).
+
+2. **Verify the change satisfies the user request (intent-driven)**
+   - Re-check the requested operations/models/decorators exist and match the requested behavior.
+   - Confirm versioning and ARM/Azure patterns required by the retrieved plan are applied.
+   - If the request includes examples / new endpoints / new API version, confirm those artifacts are present and correctly wired.
+
+#### Part 2 — How to handle validation outcomes
+
+- If validation **fails** → fix forward with minimal changes and re-validate.
+  - Prefer addressing the *root* compile/lint error over suppressing it.
+  - Keep changes scoped to what the retrieved plan requires.
+
+- If validation **passes** → ensure Part 1.2 (intent verification) also passes.
+  - If validation passes **but the request is not satisfied** → go back to **Step 1** and run another full iteration (Steps 1–4) using what you learned.
+
+- **Iteration cap**: at most **2 total iterations**. If the second iteration still does not satisfy the request, stop and ask the user for clarification or to narrow scope.
+
+Do NOT skip validation even if the change appears trivial.
 
 ---
 
