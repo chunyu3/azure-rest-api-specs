@@ -47,11 +47,11 @@ Use these inputs (already known; do not ask again):
 - typeSpecProjectPath: specification\<service>\resource-manager\Microsoft.<Service>\<ProjectFolder>
 - tspConfigRelativePath: specification\<service>\resource-manager\Microsoft.<Service>\<ProjectFolder>\tspconfig.yaml
 
-Run this command from:
+Run this command under the directory:
   <goSdkRoot>\eng\tools\generator
 
 Command:
-  go run . generate <goSdkRoot> <specsRoot> --tsp-config=<tspConfigRelativePath>
+  cd <goSdkRoot>\eng\tools\generator && go run . generate <goSdkRoot> <specsRoot> --tsp-config=<tspConfigRelativePath>
 
 Output contract:
 - Return ONLY the breaking-change summary from the FIRST `## <version>` entry in the generated package CHANGELOG.md, formatted exactly like:
