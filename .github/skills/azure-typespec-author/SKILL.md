@@ -3,9 +3,8 @@ name: azure-typespec-author
 license: MIT
 metadata:
   version: "1.0.0"
-description: "Authors and modifies Azure TypeSpec (.tsp) API specifications. USE FOR: any TypeSpec/tsp change — api versions (add, bump, preview, stable, promote), resources, operations, models, properties, decorators, visibility, constraints, breaking changes, LRO, suppressions, operationId, spread model. Covers ARM resource-manager and data-plane services. and Resolve SDK breaking changes for a typespec project. Resolve TypeSpec compiler errors. DO NOT USE FOR: SDK generation, releasing SDK packages, or single MCP tool calls. INVOKES: azure-sdk-mcp:azsdk_typespec_generate_authoring_plan, azure-sdk-mcp:azsdk_run_typespec_validation."
-compatibility:
-  requires: "azure-sdk-mcp server with azsdk_typespec_generate_authoring_plan and azsdk_run_typespec_validation tools"
+description: "Authors and modifies Azure TypeSpec (.tsp) API specifications. USE FOR: any TypeSpec/tsp change — api versions (add, bump, preview, stable, promote), resources, operations, models, properties, decorators, visibility, constraints, breaking changes, LRO, suppressions, operationId, spread model. Covers ARM resource-manager and data-plane services. DO NOT USE FOR: SDK generation, releasing SDK packages, or single MCP tool calls. INVOKES: azure-sdk-mcp:azsdk_typespec_generate_authoring_plan, azure-sdk-mcp:azsdk_run_typespec_validation."
+compatibility: "azure-sdk-mcp server with azsdk_typespec_generate_authoring_plan and azsdk_run_typespec_validation tools"
 ---
 
 # Azure TypeSpec Author
@@ -19,6 +18,16 @@ compatibility:
 
 **Prerequisite:** `azure-sdk-mcp` server must be running.
 
+# When to invoke the azure-typespec-author skill
+
+The `azure-typespec-author` skill **must** be invoked immediately in all modes (including plan mode) for any task that involves creating and modifying TypeSpec (`.tsp`) files except for `client.tsp` under the specification directory in this repository. This includes but is not limited to:
+
+- Adding, bumping, or promoting API versions (preview, stable)
+- Adding or modifying resources, operations, models, properties, or decorators
+- Changing visibility, constraints, breaking changes, LRO patterns, or suppressions
+- Defining or updating operationId, spread models, or extension resources
+- Converting Swagger to TypeSpec (post-conversion edits)
+
 ## Constraints
 
 - **Always follow the full workflow** — even seemingly simple changes (e.g. adding a default value) can require complex versioning decorator changes. Never skip steps.
@@ -28,96 +37,96 @@ compatibility:
 - **Always cite references** — provide links that justify the approach.
 - **Follow the authoring plan exactly** — code changes in Step 4 MUST follow the authoring plan generated in Step 3. Do not deviate by referring to existing code patterns in the TypeSpec project; the authoring plan is the single source of truth for what to change.
 
----
-
 ## Workflow
 
-> Classify → Intake → Plan → Apply → Validate
+> Analyze → Intake → Plan → Apply → Validate → Output reference links
 
-### Progress Checklist
+- [ ] Step 1 — Analyze project
+- [ ] Step 2 — Intake
+- [ ] Step 3 — Build authoring plan
+- [ ] Step 4 — Apply changes
+- [ ] Step 5 — Validate
+- [ ] Step 6 — Output reference links
 
-Copy and update as you progress:
+### Step 1: Analyze Project
 
-- [ ] Step 1: Analyzed project & classified as: \_\_\_
-- [ ] Step 2: Collected intake inputs
-- [ ] Step 3: Retrieved authoring plan
-- [ ] Step 4: Applied changes
-- [ ] Step 5: Validated with TypeSpec validation and `tsp compile .`
-
-### Step 1: Analyze & Classify
-
-Follow [analyze project & classify task](references/analyze-project-and-classify-task.md).
-
-Classify as exactly one:
-
-| Task Type                 | When                                                                              | `azsdk_typespec_generate_authoring_plan` |
-| ------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------- |
-| **API Version Evolution** | Adding a new preview or stable API version to an existing ARM service. (ARM only) | **MUST NOT** call                        |
-| **General Authoring**     | Any other `.tsp` change (resources, operations, models, properties, etc.)         | **MUST** call                            |
-
-State your classification explicitly before proceeding.
-
----
+See [analyze-project.md](references/analyze-project.md).
 
 ### Step 2: Intake
 
-Collect inputs needed for the change. Branch by task type:
+See [intake.md](references/intake.md).
 
-- **API Version Evolution** → Follow [API version evolution reference — Step 2](references/api-version-evolution.md#step-2-intake).
-- **General Authoring** → Follow [intake guide](references/general-authoring-intake.md).
+### Step 3: Build Authoring Plan
 
----
-
-### Step 3: Retrieve Authoring Plan
-
-Check your classification from Step 1, then branch:
-
-- **API Version Evolution** → Follow [API version evolution reference — Step 3](references/api-version-evolution.md#step-3-retrieve-authoring-plan). **MUST NOT** call `azsdk_typespec_generate_authoring_plan`.
-- **General Authoring** → **MUST** invoke `azure-sdk-mcp:azsdk_typespec_generate_authoring_plan` with:
-
-  | Parameter                 | Value                                                                                                                                                                       |
-  | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | `request`                 | User request (verbatim)                                                                                                                                                     |
-  | `additionalInformation`   | All content gathered from Steps 1–2 (intake analysis, user answers, relevant `.tsp` code read from the project), **including any case-specific Defaults noted in Step 2.2** |
-  | `typeSpecProjectRootPath` | TypeSpec project root path                                                                                                                                                  |
-
-  Do not proceed without an authoring plan from this tool.
-
----
+See [authoring-plan.md](references/authoring-plan.md).
 
 ### Step 4: Apply Changes
 
-Confirm uncertainties with the user, then make minimal `.tsp` edits.
+Make minimal `.tsp` edits following the plan from Step 3. Confirm uncertainties with the user first.
 
-- **API Version Evolution** → Apply the plan from Step 3.
-- **General Authoring** → Apply the authoring plan from Step 3.
+principles:
 
----
-
+  1. **MANDATORY:** Always check the plan output if there is any `SDK Breaking Changes` detected. If any breaking changes are present, display a dedicated warning block titled `🚨 SDK Breaking Changes` and list each breaking change one-by-one as its own warning bullet under that heading. Do NOT skip this step, even if the impact seems minor.
+  2. Confirm with user if any non-mitigation uncertainties remain.
+  3. Make the minimal changes required in the relevant `.tsp` files for the requested TypeSpec change.
+  4. **MANDATORY:** After the requested TypeSpec change has been applied, if the plan includes a mitigation for any SDK breaking change, explicitly ask the user whether they want that mitigation applied.
+  5. If the user confirms they want mitigation, apply the mitigation solution described in the plan in the relevant mitigation files. If the user declines, proceed without mitigation and state that choice in the summary.
+  6. Prefer the official template/pattern from retrieved context even if the repo has older patterns.
+  7. **MANDATORY GATE:** Complete items 1–6 before starting Step 5. Do not proceed to validation until all applicable items above are finished and documented in the response.
+  
 ### Step 5: Validate
 
-See [validation guide](references/validation.md) for sub-steps. You must run TypeSpec validation (5.1), `tsp compile .` (5.2), and example verification (5.3, API Version Evolution only).
+This step has **two parts**:
 
----
+#### Part 1 — The two validation actions to take
+
+1. **Run TypeSpec validation (tool-driven)**
+   - Invoke `azsdk_run_typespec_validation` to run TypeSpec compilation + lint validation.
+   - Follow the **Validation plan** returned by `azsdk_typespec_generate_authoring_plan` (if it calls out specific commands, project roots, or checks, use those).
+
+   **MANDATORY: Show what you are validating**
+   - In chat, explicitly state the validation plan you are following, including:
+     - The TypeSpec project root path being validated
+     - The exact tool or command being run (prefer `azsdk_run_typespec_validation`; if you also run `tsp compile`, say so)
+     - What the validation is expected to prove (compile success, linter/ruleset success, emitter output presence, etc.)
+   - If you retry validation (e.g., transient tool failure), explain why you retried and which run’s result you are reporting.
+   - If the authoring plan requires checking generated OpenAPI output, show **where** you checked (file path(s) under the project) and **what** you looked for (e.g., presence of specific parameters on a specific operation).
+
+2. **Verify the change satisfies the user request (intent-driven)**
+   - Re-check the requested operations/models/decorators exist and match the requested behavior.
+   - Confirm versioning and ARM/Azure patterns required by the retrieved plan are applied.
+   - If the request includes examples / new endpoints / new API version, confirm those artifacts are present and correctly wired.
+
+#### Part 2 — How to handle validation outcomes
+
+- If validation **fails** → fix forward with minimal changes and re-validate.
+  - Prefer addressing the *root* compile/lint error over suppressing it.
+  - Keep changes scoped to what the retrieved plan requires.
+
+- If validation **passes** → ensure Part 1.2 (intent verification) also passes.
+  - If validation passes **but the request is not satisfied** → go back to **Step 1** and run another full iteration (Steps 1–4) using what you learned.
+
+- **Iteration cap**: at most **2 total iterations**. If the second iteration still does not satisfy the request, stop and ask the user for clarification or to narrow scope.
+
+Do NOT skip validation even if the change appears trivial.
+
+### Step 6: Output Reference Links
+
+Output all referenced document URLs from Step 3. This gives the user direct links to the documentation that informed the changes.
 
 ## Reference Files
 
-| File                                                                                    | Purpose                                   |
-| --------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [analyze-project-and-classify-task.md](references/analyze-project-and-classify-task.md) | Step 1: project analysis + classification |
-| [api-version-evolution.md](references/api-version-evolution.md)                         | Steps 2–4 for API Version Evolution tasks |
-| [general-authoring-intake.md](references/general-authoring-intake.md)                   | Step 2 for General Authoring tasks        |
-| [agentic-search.md](references/agentic-search.md)                                       | Procedure for fetching external docs      |
-| [validation.md](references/validation.md)                                               | Step 5: validation sub-steps              |
+| File                                                                  | Purpose                                     |
+| --------------------------------------------------------------------- | ------------------------------------------- |
+| [analyze-project.md](references/analyze-project.md)                   | Step 1: project analysis                    |
+| [intake.md](references/intake.md)                                     | Step 2: general + case-specific intake      |
+| [authoring-plan.md](references/authoring-plan.md)                     | Step 3: build authoring plan (Option A + B) |
+| [agentic-search.md](references/agentic-search.md)                     | Procedure: fetch URLs → extract guidance    |
+| [reference-document-links.md](references/reference-document-links.md) | Catalog of external guide URLs              |
+| [validation.md](references/validation.md)                             | Step 5: validate → compile → verify         |
 
 ## Examples
 
 - "Add a new preview API version 2026-01-01-preview for widget resource manager"
-- "Bump to stable version 2026-01-01 for Microsoft.Widget"
 - "Add an ARM resource named Asset with CRUD operations"
 - "Add a new property to the Widget model"
-
-## Troubleshooting
-
-- **TypeSpec validation fails** — display all errors, provide fix suggestions, re-run validation.
-- **API Version Evolution** — use the versioning guide URLs in the [version evolution reference](references/api-version-evolution.md); do not call the authoring plan tool.
