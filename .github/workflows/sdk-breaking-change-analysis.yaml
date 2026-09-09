@@ -194,13 +194,9 @@ jobs:
             fi
           done
 
-          typespec_project_paths=()
-          for tsp_config_path in "${tsp_config_paths[@]}"; do
-            typespec_project_paths+=("${tsp_config_path%/tspconfig.yaml}")
-          done
-          typespec_project_paths_json="$(jq -cn --args '$ARGS.positional' -- "${typespec_project_paths[@]}")"
-          relative_project_paths_json="$(jq -cn --argjson paths "$typespec_project_paths_json" --arg prefix "$SPEC_REPOSITORY_PATH/" '$paths | map(ltrimstr($prefix))')"
-          echo "project-paths=$relative_project_paths_json" >> "$GITHUB_OUTPUT"
+          tsp_config_paths_json="$(jq -cn --args '$ARGS.positional' -- "${tsp_config_paths[@]}")"
+          relative_paths_json="$(jq -cn --argjson paths "$tsp_config_paths_json" --arg prefix "$SPEC_REPOSITORY_PATH/" '$paths | map(ltrimstr($prefix))')"
+          echo "paths=$relative_paths_json" >> "$GITHUB_OUTPUT"
 
       - name: Checkout target SDK repository
         uses: actions/checkout@v7
@@ -276,7 +272,7 @@ jobs:
           AZSDK_COPILOT_GITHUB_TOKEN: ${{ github.token }}
           LOCAL_SDK_REPO_PATH: ${{ github.workspace }}/repositories/${{ steps.resolve-source.outputs.sdk-repository }}
           SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
-          TYPESPEC_PROJECT_PATHS: ${{ steps.resolve-tsp-config.outputs.project-paths }}
+          TSP_CONFIG_PATHS: ${{ steps.resolve-tsp-config.outputs.paths }}
         run: |
           set -euo pipefail
           results_dir="$RUNNER_TEMP/sdk-breaking-change-results"
@@ -284,14 +280,13 @@ jobs:
           manifest_jsonl="$results_dir/projects.jsonl"
           : > "$manifest_jsonl"
           echo '[]' > "$results_dir/projects.json"
-          mapfile -t typespec_project_paths < <(jq -r '.[]' <<< "$TYPESPEC_PROJECT_PATHS")
+          mapfile -t tsp_config_paths < <(jq -r '.[]' <<< "$TSP_CONFIG_PATHS")
 
-          for index in "${!typespec_project_paths[@]}"; do
-            typespec_project_path="${typespec_project_paths[$index]}"
-            tsp_config_path="$SPEC_REPOSITORY_PATH/$typespec_project_path/tspconfig.yaml"
+          for index in "${!tsp_config_paths[@]}"; do
+            relative_tsp_config_path="${tsp_config_paths[$index]}"
+            tsp_config_path="$SPEC_REPOSITORY_PATH/$relative_tsp_config_path"
             project_number="$((index + 1))"
-            relative_results_path="project-$project_number"
-            project_results="$results_dir/$relative_results_path"
+            project_results="$results_dir/project-$project_number"
             marker="$RUNNER_TEMP/azsdk-generation-started-$project_number"
             mkdir -p "$project_results"
             touch "$marker"
@@ -305,7 +300,7 @@ jobs:
               find "$LOCAL_SDK_REPO_PATH" -type f -name tsp-location.yaml -newer "$marker" -print0
             )
             if [[ ${#generated_configs[@]} -ne 1 ]]; then
-              echo "Expected exactly one generated tsp-location.yaml for $typespec_project_path, found ${#generated_configs[@]}." >&2
+              echo "Expected exactly one generated tsp-location.yaml for $relative_tsp_config_path, found ${#generated_configs[@]}." >&2
               printf '  %s\n' "${generated_configs[@]}" >&2
               exit 1
             fi
@@ -315,7 +310,6 @@ jobs:
               echo "Invalid generated package path: $package_path" >&2
               exit 1
             fi
-            package_name="$(basename "$package_path")"
 
             azsdk package build \
               --package-path "$package_path" \
@@ -327,10 +321,9 @@ jobs:
               --output json | tee "$project_results/breaking-changes.json"
 
             jq -cn \
-              --arg typespecProjectPath "$typespec_project_path" \
-              --arg packageName "$package_name" \
-              --arg resultsPath "$relative_results_path" \
-              '{typespecProjectPath: $typespecProjectPath, packageName: $packageName, resultsPath: $resultsPath}' \
+              --arg tspConfigPath "$relative_tsp_config_path" \
+              --arg resultsPath "$project_results" \
+              '{tspConfigPath: $tspConfigPath, resultsPath: $resultsPath}' \
               >> "$manifest_jsonl"
             jq -s '.' "$manifest_jsonl" > "$results_dir/projects.json"
           done
@@ -347,12 +340,9 @@ jobs:
             manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
             if [[ -f "$manifest" ]]; then
               while IFS= read -r project; do
-                typespec_project_path="$(jq -r '.typespecProjectPath' <<< "$project")"
-                package_name="$(jq -r '.packageName' <<< "$project")"
-                results_path="$RUNNER_TEMP/sdk-breaking-change-results/$(jq -r '.resultsPath' <<< "$project")"
-                echo "### $typespec_project_path"
-                echo
-                echo "**SDK Package:** $package_name"
+                tsp_config_path="$(jq -r '.tspConfigPath' <<< "$project")"
+                results_path="$(jq -r '.resultsPath' <<< "$project")"
+                echo "### $tsp_config_path"
                 echo
                 for result in generate.json build.json breaking-changes.json; do
                   path="$results_path/$result"
@@ -383,7 +373,6 @@ jobs:
         env:
           ARTIFACT_URL: ${{ steps.upload-results.outputs.artifact-url }}
           MANIFEST_PATH: ${{ runner.temp }}/sdk-breaking-change-results/projects.json
-          RESULTS_PATH: ${{ runner.temp }}/sdk-breaking-change-results
           PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
           SDK_LANGUAGE: ${{ steps.resolve-source.outputs.sdk-language }}
           TRIGGER_NAME: ${{ github.event_name }}
@@ -394,7 +383,7 @@ jobs:
             const projects = JSON.parse(await fs.readFile(process.env.MANIFEST_PATH, "utf8"));
             const projectReports = await Promise.all(
               projects.map(async (project) => {
-                const resultPath = `${process.env.RESULTS_PATH}/${project.resultsPath}/breaking-changes.json`;
+                const resultPath = `${project.resultsPath}/breaking-changes.json`;
                 const response = JSON.parse(await fs.readFile(resultPath, "utf8"));
                 const changes = response?.result?.breakingChanges ?? [];
                 const checkboxes = changes.length
@@ -406,13 +395,7 @@ jobs:
                       return `- [ ] ${text}`;
                     })
                   : ["- [x] No SDK breaking changes detected."];
-                return [
-                  `### Typespec Project: ${project.typespecProjectPath}`,
-                  "",
-                  `**SDK Package:** ${project.packageName}`,
-                  "",
-                  ...checkboxes,
-                ];
+                return [`### ${project.tspConfigPath}`, "", ...checkboxes];
               }),
             );
 
