@@ -271,6 +271,7 @@ jobs:
             --yes
 
       - name: Analyze SDK projects
+        id: analyze-sdk-projects
         shell: bash
         env:
           AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
@@ -279,9 +280,12 @@ jobs:
           SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
           TYPESPEC_PROJECT_PATHS: ${{ steps.resolve-tsp-config.outputs.project-paths }}
         run: |
-          set -euo pipefail
+          set -Eeuo pipefail
           results_dir="$RUNNER_TEMP/sdk-breaking-change-results"
           mkdir -p "$results_dir"
+          analysis_log="$results_dir/analysis.log"
+          exec > >(tee "$analysis_log") 2>&1
+          trap 'status=$?; printf "Analysis failed with exit code %s.\n" "$status" > "$results_dir/error.log"; exit "$status"' ERR
           manifest_jsonl="$results_dir/projects.jsonl"
           : > "$manifest_jsonl"
           echo '[]' > "$results_dir/projects.json"
@@ -350,10 +354,30 @@ jobs:
       - name: Publish result summary
         if: always()
         shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
         run: |
           {
             echo "## SDK breaking-change analysis"
             echo
+            results_dir="$RUNNER_TEMP/sdk-breaking-change-results"
+            if [[ "$JOB_STATUS" == "failure" ]]; then
+              echo "## Error"
+              echo
+              if [[ -f "$results_dir/error.log" ]]; then
+                cat "$results_dir/error.log"
+              else
+                echo "The workflow failed before SDK analysis completed."
+              fi
+              if [[ "$ANALYSIS_OUTCOME" == "failure" && -f "$results_dir/analysis.log" ]]; then
+                echo
+                echo "### Analysis log (last 100 lines)"
+                echo
+                tail -n 100 "$results_dir/analysis.log" | sed 's/^/    /'
+                echo
+              fi
+            fi
             manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
             if [[ -f "$manifest" ]]; then
               while IFS= read -r project; do
@@ -479,4 +503,41 @@ jobs:
               ...context.repo,
               issue_number: pullNumber,
               body: report,
+            });
+
+      - name: Report breaking-change analysis failure
+        if: failure()
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
+          TRIGGER_NAME: ${{ github.event_name }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const failureReport = "Breaking change analysis failed";
+            if (process.env.TRIGGER_NAME === "issue_comment") {
+              const { data: comment } = await github.rest.issues.getComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+              });
+              const command = comment.body.split(/\r?\n/, 1)[0].trim();
+              try {
+                await github.rest.issues.updateComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                  body: `${command}\n\n${failureReport}`,
+                });
+                return;
+              } catch (error) {
+                if (error.status !== 403) throw error;
+                core.warning(
+                  "The workflow token cannot edit the trigger comment; posting the failure as a new PR comment instead.",
+                );
+              }
+            }
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body: failureReport,
             });
