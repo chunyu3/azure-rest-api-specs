@@ -414,8 +414,7 @@ jobs:
                     ? text.replaceAll("\r", "").replaceAll("|", "\\|").replaceAll("\n", "<br>")
                     : fallback;
                 };
-                const tableRows = changes.length
-                  ? changes.map((change) => {
+                const changeDetails = changes.map((change) => {
                       const details = typeof change === "object" && change !== null ? change : {};
                       const text = escapeTableCell(details.breakingChange ?? change);
                       const category = escapeTableCell(
@@ -424,15 +423,25 @@ jobs:
                       const suggestedFix = escapeTableCell(
                         details.resolution ?? details.resolution,
                       );
-                      return `| - [ ] | ${text} | ${category} | ${suggestedFix} |`;
-                    })
-                  : ["| - [x] | No SDK breaking changes detected. | - | - |"];
+                      return { text, category, suggestedFix };
+                    });
+                const checklist = changeDetails.length
+                  ? changeDetails.map(({ text }, index) => `- [ ] ${index + 1}. ${text}`)
+                  : ["- [x] No SDK breaking changes detected."];
+                const tableRows = changeDetails.length
+                  ? changeDetails.map(
+                      ({ text, category, suggestedFix }, index) =>
+                        `| ${index + 1} | ${text} | ${category} | ${suggestedFix} |`,
+                    )
+                  : ["| - | No SDK breaking changes detected. | - | - |"];
                 const projectReport = [
                   `**Typespec Project:** ${project.typespecProjectPath}`,
                   "",
                   `**SDK Package:** ${project.packageName}`,
                   "",
-                  "| Checkbox | Breaking change | Category | Suggested fix |",
+                  ...checklist,
+                  "",
+                  "| # | Breaking change | Category | Suggested fix |",
                   "| --- | --- | --- | --- |",
                   ...tableRows,
                 ];
