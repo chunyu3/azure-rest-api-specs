@@ -370,6 +370,8 @@ jobs:
         shell: bash
         env:
           JOB_STATUS: ${{ job.status }}
+          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
+          JOB_LOG_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
         run: |
           {
             echo "## SDK breaking-change analysis"
@@ -377,7 +379,17 @@ jobs:
             if [[ "$JOB_STATUS" == "failure" ]]; then
               echo "Breaking change analysis failed."
               echo
-              echo "See the failed step logs for details."
+              analysis_log="$RUNNER_TEMP/sdk-breaking-change-results/analysis.log"
+              if [[ "$ANALYSIS_OUTCOME" == "failure" && -f "$analysis_log" ]]; then
+                echo "### Error"
+                echo
+                tail -n 30 "$analysis_log" | sed 's/^/    /'
+                echo
+              else
+                echo "Error output is available in the failed step log."
+                echo
+              fi
+              echo "[See failed step]($JOB_LOG_URL)"
             else
               manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
               if [[ -f "$manifest" ]]; then
@@ -513,11 +525,37 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
           TRIGGER_NAME: ${{ github.event_name }}
-          WORKFLOW_SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#summary-${{ job.check_run_id }}
+          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
+          RESULTS_PATH: ${{ runner.temp }}/sdk-breaking-change-results
+          JOB_LOG_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const failureReport = `Breaking change analysis failed\n\n[See details](${process.env.WORKFLOW_SUMMARY_URL})`;
+            const fs = await import("node:fs/promises");
+            let errorDetails = "";
+            if (process.env.ANALYSIS_OUTCOME === "failure") {
+              try {
+                const analysisLog = await fs.readFile(
+                  `${process.env.RESULTS_PATH}/analysis.log`,
+                  "utf8",
+                );
+                errorDetails = analysisLog
+                  .trim()
+                  .split(/\r?\n/)
+                  .slice(-30)
+                  .map((line) => `    ${line}`)
+                  .join("\n");
+              } catch (error) {
+                core.warning(`Unable to read the analysis error log: ${error.message}`);
+              }
+            }
+            const failureReport = [
+              "Breaking change analysis failed",
+              errorDetails && `\n${errorDetails}`,
+              `\n[See failed step](${process.env.JOB_LOG_URL})`,
+            ]
+              .filter(Boolean)
+              .join("\n");
             if (process.env.TRIGGER_NAME === "issue_comment") {
               const { data: comment } = await github.rest.issues.getComment({
                 ...context.repo,
