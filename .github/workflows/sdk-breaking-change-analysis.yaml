@@ -424,17 +424,17 @@ jobs:
                 const tableRows = changeDetails.length
                   ? changeDetails.map(
                       ({ text, category, suggestedFix }) =>
-                        `| <input type="checkbox" disabled> | ${text} | ${category} | ${suggestedFix} |`,
+                        `| ☐ | ${text} | ${category} | ${suggestedFix} |`,
                     )
                   : [
-                      '| <input type="checkbox" checked disabled> | No SDK breaking changes detected. | - | - |',
+                      "| ☐ | No SDK breaking changes detected. | - | - |",
                     ];
                 const projectReport = [
                   `**Typespec Project:** ${project.typespecProjectPath}`,
                   "",
                   `**SDK Package:** ${project.packageName}`,
                   "",
-                  "| Checkbox | Breaking change | Category | Suggested fix |",
+                  "|  | Breaking change | Category | Suggested fix |",
                   "| --- | --- | --- | --- |",
                   ...tableRows,
                 ];
