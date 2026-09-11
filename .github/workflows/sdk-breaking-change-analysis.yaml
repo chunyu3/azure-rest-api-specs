@@ -224,6 +224,20 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      - name: Set up Python
+        if: steps.resolve-source.outputs.sdk-language == 'Python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Set up Python SDK environment
+        if: steps.resolve-source.outputs.sdk-language == 'Python'
+        shell: bash
+        working-directory: repositories/${{ steps.resolve-source.outputs.sdk-repository }}
+        run: |
+          python -m pip install -U pip > /dev/null
+          python -m pip install eng/tools/azure-sdk-tools[ghtools] > /dev/null
+
       - name: Install golangci-lint
         if: steps.resolve-source.outputs.sdk-language == 'Go'
         shell: bash
@@ -356,30 +370,17 @@ jobs:
         shell: bash
         env:
           JOB_STATUS: ${{ job.status }}
-          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
         run: |
           {
             echo "## SDK breaking-change analysis"
             echo
-            results_dir="$RUNNER_TEMP/sdk-breaking-change-results"
             if [[ "$JOB_STATUS" == "failure" ]]; then
-              echo "## Error"
+              echo "Breaking change analysis failed."
               echo
-              if [[ -f "$results_dir/error.log" ]]; then
-                cat "$results_dir/error.log"
-              else
-                echo "The workflow failed before SDK analysis completed."
-              fi
-              if [[ "$ANALYSIS_OUTCOME" == "failure" && -f "$results_dir/analysis.log" ]]; then
-                echo
-                echo "### Analysis log (last 100 lines)"
-                echo
-                tail -n 100 "$results_dir/analysis.log" | sed 's/^/    /'
-                echo
-              fi
-            fi
-            manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
-            if [[ -f "$manifest" ]]; then
+              echo "See the failed step logs for details."
+            else
+              manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
+              if [[ -f "$manifest" ]]; then
               while IFS= read -r project; do
                 typespec_project_path="$(jq -r '.typespecProjectPath' <<< "$project")"
                 package_name="$(jq -r '.packageName' <<< "$project")"
@@ -398,6 +399,7 @@ jobs:
                   fi
                 done
               done < <(jq -c '.[]' "$manifest")
+              fi
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -511,10 +513,11 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
           TRIGGER_NAME: ${{ github.event_name }}
+          WORKFLOW_SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#summary-${{ job.check_run_id }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const failureReport = "Breaking change analysis failed";
+            const failureReport = `Breaking change analysis failed\n\n[See details](${process.env.WORKFLOW_SUMMARY_URL})`;
             if (process.env.TRIGGER_NAME === "issue_comment") {
               const { data: comment } = await github.rest.issues.getComment({
                 ...context.repo,
