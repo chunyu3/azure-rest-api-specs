@@ -415,33 +415,26 @@ jobs:
                     : fallback;
                 };
                 const changeDetails = changes.map((change) => {
-                      const details = typeof change === "object" && change !== null ? change : {};
-                      const text = escapeTableCell(details.breakingChange ?? change);
-                      const category = escapeTableCell(
-                        details.category ?? details.category,
-                      );
-                      const suggestedFix = escapeTableCell(
-                        details.resolution ?? details.resolution,
-                      );
-                      return { text, category, suggestedFix };
-                    });
-                const checklist = changeDetails.length
-                  ? changeDetails.map(({ text }, index) => `- [ ] ${index + 1}. ${text}`)
-                  : ["- [x] No SDK breaking changes detected."];
+                  const details = typeof change === "object" && change !== null ? change : {};
+                  const text = escapeTableCell(details.breakingChange ?? change);
+                  const category = escapeTableCell(details.category);
+                  const suggestedFix = escapeTableCell(details.resolution);
+                  return { text, category, suggestedFix };
+                });
                 const tableRows = changeDetails.length
                   ? changeDetails.map(
-                      ({ text, category, suggestedFix }, index) =>
-                        `| ${index + 1} | ${text} | ${category} | ${suggestedFix} |`,
+                      ({ text, category, suggestedFix }) =>
+                        `| <input type="checkbox" disabled> | ${text} | ${category} | ${suggestedFix} |`,
                     )
-                  : ["| - | No SDK breaking changes detected. | - | - |"];
+                  : [
+                      '| <input type="checkbox" checked disabled> | No SDK breaking changes detected. | - | - |',
+                    ];
                 const projectReport = [
                   `**Typespec Project:** ${project.typespecProjectPath}`,
                   "",
                   `**SDK Package:** ${project.packageName}`,
                   "",
-                  ...checklist,
-                  "",
-                  "| # | Breaking change | Category | Suggested fix |",
+                  "| Checkbox | Breaking change | Category | Suggested fix |",
                   "| --- | --- | --- | --- |",
                   ...tableRows,
                 ];
