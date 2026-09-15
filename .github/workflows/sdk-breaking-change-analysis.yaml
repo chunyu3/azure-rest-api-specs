@@ -300,6 +300,12 @@ jobs:
           analysis_log="$results_dir/analysis.log"
           exec > >(tee "$analysis_log") 2>&1
           trap 'status=$?; printf "Analysis failed with exit code %s.\n" "$status" > "$results_dir/error.log"; exit "$status"' ERR
+          jq -cn \
+            --argjson pullNumber '${{ github.event.issue.number || inputs.pr_number }}' \
+            --arg sdkLanguage '${{ steps.resolve-source.outputs.sdk-language }}' \
+            --arg triggerCommentId '${{ github.event.comment.id }}' \
+            '{pullNumber: $pullNumber, sdkLanguage: $sdkLanguage, triggerCommentId: $triggerCommentId}' \
+            > "$results_dir/trigger.json"
           manifest_jsonl="$results_dir/projects.jsonl"
           : > "$manifest_jsonl"
           echo '[]' > "$results_dir/projects.json"
@@ -550,7 +556,7 @@ jobs:
               }
             }
             const failureReport = [
-              "Breaking change analysis failed",
+              "> [!CAUTION]\n> Breaking change analysis failed",
               errorDetails && `\n${errorDetails}`,
               `\n[See failed step](${process.env.JOB_LOG_URL})`,
             ]
