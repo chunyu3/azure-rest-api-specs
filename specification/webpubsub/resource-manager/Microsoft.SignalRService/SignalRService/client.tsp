@@ -478,3 +478,6 @@ op WebPubSubSharedPrivateLinkResourcesDeleteCustomized(
   WebPubSubSharedPrivateLinkResourcesDeleteCustomized,
   "go,python,javascript"
 );
+
+@@clientName(WebPubSubResource, "ResourceInfo", "go");
+@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
