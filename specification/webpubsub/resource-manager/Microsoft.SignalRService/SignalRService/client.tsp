@@ -32,12 +32,7 @@ using Http;
 @@clientName(NetworkACL, "NetworkAcl", "java");
 @@clientName(IPRule, "IpRule", "java");
 @@clientName(PrivateEndpointACL, "PrivateEndpointAcl", "java");
-@@clientName(Microsoft.SignalRService.WebPubSubResource, "ResourceInfo", "go");
-@@clientName(
-  Microsoft.SignalRService.WebPubSubResourceList,
-  "ResourceInfoList",
-  "go"
-);
+
 @@clientName(EventHandler, "WebPubSubEventHandler", "csharp");
 @@clientName(WebPubSubRequestType.RESTAPI, "RestApi", "csharp");
 @@clientName(ProvisioningState, "WebPubSubProvisioningState", "csharp");
@@ -95,18 +90,6 @@ using Http;
 );
 
 @@clientName(WebPubSubResource, "WebPubSub", "csharp");
-#suppress "@azure-tools/typespec-client-generator-core/client-option" "RBAC roles for provisioning"
-#suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "RBAC roles for provisioning"
-@@clientOption(
-  WebPubSubResource,
-  "resource-rbac-roles",
-  #{
-    WebPubSubServiceReader: "bfb1c7d2-fb1a-466b-b2ba-aee63b92deaf",
-    WebPubSubServiceOwner: "12cf5a90-567b-43ae-8102-96cf46c7d9b4",
-    WebPubSubContributor: "8cf5e20a-e4b2-4e9d-b3a1-5ceb692c2761",
-  },
-  "csharp"
-);
 @@clientName(WebPubSubProperties.disableAadAuth, "IsAadAuthDisabled", "csharp");
 @@clientName(
   WebPubSubTlsSettings.clientCertEnabled,
@@ -248,7 +231,9 @@ using Http;
 @@clientName(UpstreamAuthSettings.type, "AuthType", "csharp");
 @@alternateType(SignalRServiceUsage.id, armResourceIdentifier, "csharp");
 @@clientName(LiveTraceCategory.enabled, "IsEnabled", "csharp");
+@@alternateType(LiveTraceCategory.enabled, boolean, "csharp");
 @@clientName(LiveTraceConfiguration.enabled, "IsEnabled", "csharp");
+@@alternateType(LiveTraceConfiguration.enabled, boolean, "csharp");
 @@clientName(
   WebPubSubResources.list,
   "GetWebPubSubPrivateLinkResources",
@@ -261,9 +246,7 @@ using Http;
 @@markAsPageable(WebPubSubResources.listSkus, "csharp");
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubHubsGetCustomized(
   ...Azure.ResourceManager.ProviderNamespace<WebPubSubHub>,
@@ -288,9 +271,7 @@ op WebPubSubHubsGetCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubHubsCreateOrUpdateCustomized(
   ...Azure.ResourceManager.ProviderNamespace<WebPubSubHub>,
@@ -318,9 +299,7 @@ op WebPubSubHubsCreateOrUpdateCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubHubsDeleteCustomized(
   ...Azure.ResourceManager.ProviderNamespace<WebPubSubHub>,
@@ -345,9 +324,7 @@ op WebPubSubHubsDeleteCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op PrivateEndpointConnectionsGetCustomized(
   ...Azure.ResourceManager.ProviderNamespace<PrivateEndpointConnection>,
@@ -372,9 +349,7 @@ op PrivateEndpointConnectionsGetCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op PrivateEndpointConnectionsUpdateCustomized(
   ...Azure.ResourceManager.ProviderNamespace<PrivateEndpointConnection>,
@@ -402,9 +377,7 @@ op PrivateEndpointConnectionsUpdateCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op PrivateEndpointConnectionsDeleteCustomized(
   ...Azure.ResourceManager.ProviderNamespace<PrivateEndpointConnection>,
@@ -429,9 +402,7 @@ op PrivateEndpointConnectionsDeleteCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubSharedPrivateLinkResourcesGetCustomized(
   ...Azure.ResourceManager.Legacy.Provider,
@@ -456,9 +427,7 @@ op WebPubSubSharedPrivateLinkResourcesGetCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubSharedPrivateLinkResourcesCreateOrUpdateCustomized(
   ...Azure.ResourceManager.Legacy.Provider,
@@ -486,9 +455,7 @@ op WebPubSubSharedPrivateLinkResourcesCreateOrUpdateCustomized(
 );
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "customization"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-operation-decorator" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-api-version" "FIXME: review suppression and update justification"
-#suppress "@azure-tools/typespec-azure-resource-manager/use-interface" "customization"
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation" "customization"
 #suppress "@azure-tools/typespec-azure-core/documentation-required" "override"
 op WebPubSubSharedPrivateLinkResourcesDeleteCustomized(
   ...Azure.ResourceManager.Legacy.Provider,
