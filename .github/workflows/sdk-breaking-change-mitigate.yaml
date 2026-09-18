@@ -29,6 +29,25 @@ jobs:
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
       startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate')) ||
       github.event_name == 'workflow_dispatch'
+    concurrency:
+      group: >-
+        sdk-breaking-mitigate-${{ github.event.issue.number || inputs.pr_number }}-${{
+        inputs.sdk_language ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate javascript') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate typescript') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate dotnet') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate csharp') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate .net') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate android') && 'Android') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate cpp') && 'Cpp') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate java') && 'Java') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate python') && 'Python') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate rust') && 'Rust') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate go') && 'Go') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate js') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-mitigate ts') && 'JavaScript') ||
+        'unknown' }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     env:
       AZSDK_CLI_PATH: /tmp/bin
@@ -174,14 +193,19 @@ jobs:
             exit 1
           fi
           if [[ -f "$trigger_path" ]]; then
-            echo "pull-number=$(jq -r '.pullNumber' "$trigger_path")" >> "$GITHUB_OUTPUT"
-            echo "sdk-language=$(jq -r '.sdkLanguage' "$trigger_path")" >> "$GITHUB_OUTPUT"
-            echo "trigger-comment-id=$(jq -r '.triggerCommentId' "$trigger_path")" >> "$GITHUB_OUTPUT"
+            pull_number="$(jq -r '.pullNumber' "$trigger_path")"
+            sdk_language="$(jq -r '.sdkLanguage' "$trigger_path")"
+            trigger_comment_id="$(jq -r '.triggerCommentId' "$trigger_path")"
           else
-            echo "pull-number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
-            echo "sdk-language=$SDK_LANGUAGE" >> "$GITHUB_OUTPUT"
-            echo "trigger-comment-id=$TRIGGER_COMMENT_ID" >> "$GITHUB_OUTPUT"
+            pull_number="$PR_NUMBER"
+            sdk_language="$SDK_LANGUAGE"
+            trigger_comment_id="$TRIGGER_COMMENT_ID"
           fi
+          {
+            echo "pull-number=$pull_number"
+            echo "sdk-language=$sdk_language"
+            echo "trigger-comment-id=$trigger_comment_id"
+          } >> "$GITHUB_OUTPUT"
           if [[ -n "$RESULT_PATHS" ]]; then
             jq --argjson resultPaths "$RESULT_PATHS" \
               'map(. as $project | select($resultPaths | index($project.resultsPath + "/breaking-changes.json")))' \
@@ -212,6 +236,20 @@ jobs:
             core.setOutput("repository", pull.head.repo.full_name);
             core.setOutput("ref", pull.head.sha);
             core.setOutput("branch", pull.head.ref);
+            core.setOutput("pushed-at", pull.updated_at);
+
+      - name: Verify pull request was not updated after the trigger
+        if: github.event_name == 'issue_comment'
+        shell: bash
+        env:
+          COMMENTED_AT: ${{ github.event.comment.updated_at }}
+          PUSHED_AT: ${{ steps.resolve-pr-source.outputs.pushed-at }}
+        run: |
+          set -euo pipefail
+          if [[ "$(date -d "$PUSHED_AT" +%s)" -gt "$(date -d "$COMMENTED_AT" +%s)" ]]; then
+            echo "The pull request was updated after the mitigation command. Skip this mitigation." >&2
+            exit 1
+          fi
 
       - name: Checkout specification PR source
         if: steps.resolve-trigger.outputs.should-run == 'true'
