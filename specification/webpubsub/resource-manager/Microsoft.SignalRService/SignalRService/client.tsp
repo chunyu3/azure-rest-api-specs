@@ -33,6 +33,11 @@ using Http;
 @@clientName(IPRule, "IpRule", "java");
 @@clientName(PrivateEndpointACL, "PrivateEndpointAcl", "java");
 
+@@clientName(WebPubSubResource, "ResourceInfo", "go");
+@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
+@@clientName(ResourceSku.familiyNew, "Family", "go");
+@@clientName(ResourceSku.tierNew, "Tier", "go");
+
 @@clientName(EventHandler, "WebPubSubEventHandler", "csharp");
 @@clientName(WebPubSubRequestType.RESTAPI, "RestApi", "csharp");
 @@clientName(ProvisioningState, "WebPubSubProvisioningState", "csharp");
