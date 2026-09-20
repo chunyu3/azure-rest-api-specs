@@ -13,6 +13,9 @@ using Http;
   "javascript,python"
 );
 
+@@clientName(WebPubSubResource, "ResourceInfo", "go");
+@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
+
 @@clientDoc(
   Microsoft.SignalRService.EventHandler.urlTemplate,
   """
