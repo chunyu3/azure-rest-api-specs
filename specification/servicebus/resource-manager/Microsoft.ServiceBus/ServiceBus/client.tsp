@@ -6,19 +6,19 @@ using Microsoft.ServiceBus;
 
 @@clientName(Microsoft.ServiceBus, "ServiceBusManagementClient", "javascript");
 @@clientName(Microsoft.ServiceBus, "ServiceBusManagementClient", "python");
-
 @@clientName(NetworkRuleIPAction, "NetworkRuleIpAction", "java");
-@@clientName(
-  NamespaceFailoverProperties,
-  "FailoverProperties",
-  "java,javascript"
-);
+@@clientName(NamespaceFailoverProperties, "FailoverProperties", "java,javascript");
 
-// Fix TLS version naming changes for Go SDK compatibility
+// Fix TLS version naming changes for Python SDK compatibility
 @@clientName(TlsVersion.`1.0`, "ONE0", "python");
 @@clientName(TlsVersion.`1.1`, "ONE1", "python");
 @@clientName(TlsVersion.`1.2`, "ONE2", "python");
 @@clientName(TlsVersion.`1.3`, "ONE3", "python");
+
+// Preserve the previous TLS version names in the Go SDK.
+@@clientName(TlsVersion.`1.0`, "One0", "go");
+@@clientName(TlsVersion.`1.1`, "One1", "go");
+@@clientName(TlsVersion.`1.2`, "One2", "go");
 
 @@clientName(ErrorAdditionalInfo, "ServiceBusErrorAdditionalInfo", "csharp");
 @@clientName(UnavailableReason, "ServiceBusNameUnavailableReason", "csharp");
@@ -34,16 +34,8 @@ using Microsoft.ServiceBus;
 @@clientName(TlsVersion.`1.3`, "Tls13", "csharp");
 @@clientName(MigrationConfigProperties, "MigrationConfiguration", "csharp");
 @@clientName(KeyType, "ServiceBusAccessKeyType", "csharp");
-@@clientName(
-  RegenerateAccessKeyParameters,
-  "ServiceBusRegenerateAccessKeyContent",
-  "csharp"
-);
-@@clientName(
-  ProvisioningStateDR,
-  "ServiceBusDisasterRecoveryProvisioningState",
-  "csharp"
-);
+@@clientName(RegenerateAccessKeyParameters, "ServiceBusRegenerateAccessKeyContent", "csharp");
+@@clientName(ProvisioningStateDR, "ServiceBusDisasterRecoveryProvisioningState", "csharp");
 @@clientName(RoleDisasterRecovery, "ServiceBusDisasterRecoveryRole", "csharp");
 @@clientName(ArmDisasterRecovery, "ServiceBusDisasterRecovery", "csharp");
 @@clientName(AccessKeys, "ServiceBusAccessKeys", "csharp");
@@ -51,245 +43,91 @@ using Microsoft.ServiceBus;
 @@clientName(Rule, "ServiceBusRule", "csharp");
 @@clientName(Action, "ServiceBusFilterAction", "csharp");
 @@clientName(Encryption, "ServiceBusEncryption", "csharp");
-@@clientName(
-  ConnectionState,
-  "ServiceBusPrivateLinkServiceConnectionState",
-  "csharp"
-);
-@@clientName(
-  PrivateLinkConnectionStatus,
-  "ServiceBusPrivateLinkConnectionStatus",
-  "csharp"
-);
-@@clientName(
-  EndPointProvisioningState,
-  "ServiceBusPrivateEndpointConnectionProvisioningState",
-  "csharp"
-);
-@@clientName(
-  PublicNetworkAccessFlag,
-  "ServiceBusPublicNetworkAccessFlag",
-  "csharp"
-);
+@@clientName(ConnectionState, "ServiceBusPrivateLinkServiceConnectionState", "csharp");
+@@clientName(PrivateLinkConnectionStatus, "ServiceBusPrivateLinkConnectionStatus", "csharp");
+@@clientName(EndPointProvisioningState, "ServiceBusPrivateEndpointConnectionProvisioningState", "csharp");
+@@clientName(PublicNetworkAccessFlag, "ServiceBusPublicNetworkAccessFlag", "csharp");
 @@clientName(NWRuleSetIpRules, "ServiceBusNetworkRuleSetIPRules", "csharp");
 @@clientName(IpAddressType, "ServiceBusIPAddressType", "csharp");
 @@clientName(SBNamespaceProperties.ipAddressType, "IPAddressType", "csharp");
 @@clientName(NetworkRuleIPAction, "ServiceBusNetworkRuleIPAction", "csharp");
-@@clientName(
-  NWRuleSetVirtualNetworkRules,
-  "ServiceBusNetworkRuleSetVirtualNetworkRules",
-  "csharp"
-);
+@@clientName(NWRuleSetVirtualNetworkRules, "ServiceBusNetworkRuleSetVirtualNetworkRules", "csharp");
 @@clientName(DefaultAction, "ServiceBusNetworkRuleSetDefaultAction", "csharp");
 @@clientName(SBTopic, "ServiceBusTopic", "csharp");
 @@clientName(SBQueue, "ServiceBusQueue", "csharp");
 @@clientName(SBSubscription, "ServiceBusSubscription", "csharp");
-@@clientName(
-  SBClientAffineProperties,
-  "ServiceBusClientAffineProperties",
-  "csharp"
-);
+@@clientName(SBClientAffineProperties, "ServiceBusClientAffineProperties", "csharp");
 @@clientName(KeyVaultProperties, "ServiceBusKeyVaultProperties", "csharp");
 @@clientName(SBNamespace, "ServiceBusNamespace", "csharp");
 @@clientName(SBSku, "ServiceBusSku", "csharp");
 @@clientName(SBAuthorizationRule, "ServiceBusAuthorizationRule", "csharp");
-@@clientName(
-  CheckNameAvailability,
-  "ServiceBusNameAvailabilityContent",
-  "csharp"
-);
-@@clientName(
-  CheckNameAvailabilityResult,
-  "ServiceBusNameAvailabilityResult",
-  "csharp"
-);
+@@clientName(CheckNameAvailability, "ServiceBusNameAvailabilityContent", "csharp");
+@@clientName(CheckNameAvailabilityResult, "ServiceBusNameAvailabilityResult", "csharp");
 @@clientName(NetworkRuleSet, "ServiceBusNetworkRuleSet", "csharp");
-@@clientName(
-  NamespaceReplicaLocation,
-  "ServiceBusNamespaceReplicaLocation",
-  "csharp"
-);
-@@clientName(
-  NetworkSecurityPerimeter,
-  "ServiceBusNetworkSecurityPerimeter",
-  "csharp"
-);
-@@clientName(
-  NetworkSecurityPerimeterConfiguration,
-  "ServiceBusNetworkSecurityPerimeterConfiguration",
-  "csharp"
-);
-@@clientName(
-  NetworkSecurityPerimeterConfigurationPropertiesProfile,
-  "ServiceBusNetworkSecurityPerimeterConfigurationPropertiesProfile",
-  "csharp"
-);
-@@clientName(
-  NetworkSecurityPerimeterConfigurationPropertiesResourceAssociation,
-  "ServiceBusNetworkSecurityPerimeterConfigurationPropertiesResourceAssociation",
-  "csharp"
-);
-@@clientName(
-  NetworkSecurityPerimeterConfigurationProvisioningState,
-  "ServiceBusNetworkSecurityPerimeterConfigurationProvisioningState",
-  "csharp"
-);
+@@clientName(NamespaceReplicaLocation, "ServiceBusNamespaceReplicaLocation", "csharp");
+@@clientName(NetworkSecurityPerimeter, "ServiceBusNetworkSecurityPerimeter", "csharp");
+@@clientName(NetworkSecurityPerimeterConfiguration, "ServiceBusNetworkSecurityPerimeterConfiguration", "csharp");
+@@clientName(NetworkSecurityPerimeterConfigurationPropertiesProfile, "ServiceBusNetworkSecurityPerimeterConfigurationPropertiesProfile", "csharp");
+@@clientName(NetworkSecurityPerimeterConfigurationPropertiesResourceAssociation, "ServiceBusNetworkSecurityPerimeterConfigurationPropertiesResourceAssociation", "csharp");
+@@clientName(NetworkSecurityPerimeterConfigurationProvisioningState, "ServiceBusNetworkSecurityPerimeterConfigurationProvisioningState", "csharp");
 @@clientName(NspAccessRule, "ServiceBusNspAccessRule", "csharp");
-@@clientName(
-  NspAccessRuleDirection,
-  "ServiceBusNspAccessRuleDirection",
-  "csharp"
-);
-@@clientName(
-  NspAccessRuleProperties,
-  "ServiceBusNspAccessRuleProperties",
-  "csharp"
-);
-@@clientName(
-  ResourceAssociationAccessMode,
-  "ServiceBusResourceAssociationAccessMode",
-  "csharp"
-);
+@@clientName(NspAccessRuleDirection, "ServiceBusNspAccessRuleDirection", "csharp");
+@@clientName(NspAccessRuleProperties, "ServiceBusNspAccessRuleProperties", "csharp");
+@@clientName(ResourceAssociationAccessMode, "ServiceBusResourceAssociationAccessMode", "csharp");
 @@clientName(Mode, "ServiceBusConfidentialComputeMode", "csharp");
-@@clientName(
-  ProvisioningIssue,
-  "ServiceBusNspConfigurationProvisioningIssue",
-  "csharp"
-);
-@@clientName(
-  ProvisioningIssueProperties,
-  "ServiceBusNspConfigurationProvisioningIssueProperties",
-  "csharp"
-);
+@@clientName(ProvisioningIssue, "ServiceBusNspConfigurationProvisioningIssue", "csharp");
+@@clientName(ProvisioningIssueProperties, "ServiceBusNspConfigurationProvisioningIssueProperties", "csharp");
 @@clientName(FailOver, "ServiceBusNamespaceFailOver", "csharp");
 @@clientName(FailOverProperties.force, "IsForced", "csharp");
-@@clientName(
-  SBNamespaces.privateLinkResourcesGet,
-  "GetPrivateLinkResources",
-  "csharp"
-);
+@@clientName(SBNamespaces.privateLinkResourcesGet, "GetPrivateLinkResources", "csharp");
 
 // Preserve the resource name constraints emitted by the reflection-based provisioning generator.
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  SBNamespace,
-  "resource-name-constraint",
-  #{ minLength: 6, maxLength: 50, pattern: "^[a-zA-Z0-9-]+$" },
-  "csharp"
-);
+@@clientOption(SBNamespace, "resource-name-constraint", #{ minLength: 6, maxLength: 50, pattern: "^[a-zA-Z0-9-]+$" }, "csharp");
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  SBAuthorizationRule,
-  "resource-name-constraint",
-  #{ minLength: 1, maxLength: 50, pattern: "^[a-zA-Z0-9._-]+$" },
-  "csharp"
-);
+@@clientOption(SBAuthorizationRule, "resource-name-constraint", #{ minLength: 1, maxLength: 50, pattern: "^[a-zA-Z0-9._-]+$" }, "csharp");
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  ArmDisasterRecovery,
-  "resource-name-constraint",
-  #{ minLength: 6, maxLength: 50, pattern: "^[a-zA-Z0-9-]+$" },
-  "csharp"
-);
+@@clientOption(ArmDisasterRecovery, "resource-name-constraint", #{ minLength: 6, maxLength: 50, pattern: "^[a-zA-Z0-9-]+$" }, "csharp");
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  SBQueue,
-  "resource-name-constraint",
-  #{ minLength: 1, maxLength: 260, pattern: "^[a-zA-Z0-9._-]+$" },
-  "csharp"
-);
+@@clientOption(SBQueue, "resource-name-constraint", #{ minLength: 1, maxLength: 260, pattern: "^[a-zA-Z0-9._-]+$" }, "csharp");
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  SBTopic,
-  "resource-name-constraint",
-  #{ minLength: 1, maxLength: 260, pattern: "^[a-zA-Z0-9._-]+$" },
-  "csharp"
-);
+@@clientOption(SBTopic, "resource-name-constraint", #{ minLength: 1, maxLength: 260, pattern: "^[a-zA-Z0-9._-]+$" }, "csharp");
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "Name constraints for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "Name constraints for provisioning compatibility"
-@@clientOption(
-  SBSubscription,
-  "resource-name-constraint",
-  #{ minLength: 1, maxLength: 50, pattern: "^[a-zA-Z0-9._-]+$" },
-  "csharp"
-);
+@@clientOption(SBSubscription, "resource-name-constraint", #{ minLength: 1, maxLength: 50, pattern: "^[a-zA-Z0-9._-]+$" }, "csharp");
 
 // Preserve the namespace RBAC role helpers emitted by the reflection-based provisioning generator.
 #suppress "@azure-tools/typespec-client-generator-core/client-option" "RBAC roles for provisioning compatibility"
 #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope" "RBAC roles for provisioning compatibility"
-@@clientOption(
-  SBNamespace,
-  "resource-rbac-roles",
-  #{
-    AzureServiceBusDataOwner: "090c5cfd-751d-490a-894a-3ce6f1109419",
-    AzureServiceBusDataReceiver: "4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0",
-    AzureServiceBusDataSender: "69a216fc-b8fb-44d8-bc22-1f3c2cd27a39",
-  },
-  "csharp"
-);
+@@clientOption(SBNamespace, "resource-rbac-roles", #{ AzureServiceBusDataOwner: "090c5cfd-751d-490a-894a-3ce6f1109419", AzureServiceBusDataReceiver: "4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0", AzureServiceBusDataSender: "69a216fc-b8fb-44d8-bc22-1f3c2cd27a39" }, "csharp");
 
 #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Change the operation back to pageable for backward compatibility"
-@@Azure.ClientGenerator.Core.Legacy.markAsPageable(
-  SBNamespaces.privateLinkResourcesGet,
-  "csharp"
-);
+@@Azure.ClientGenerator.Core.Legacy.markAsPageable(SBNamespaces.privateLinkResourcesGet, "csharp");
 @@clientName(NWRuleSetIpRules.ipMask, "IPMask", "csharp");
 @@clientName(CorrelationFilter.to, "SendTo", "csharp");
 @@clientName(CorrelationFilter.label, "Subject", "csharp");
 @@clientName(SBNamespaceProperties.zoneRedundant, "IsZoneRedundant", "csharp");
-@@clientName(
-  NetworkRuleSetProperties.trustedServiceAccessEnabled,
-  "IsTrustedServiceAccessEnabled",
-  "csharp"
-);
-@@clientName(
-  CheckNameAvailabilityResult.nameAvailable,
-  "IsNameAvailable",
-  "csharp"
-);
-@@clientName(
-  MigrationConfigPropertiesProperties.targetNamespace,
-  "TargetServiceBusNamespace",
-  "csharp"
-);
-@@alternateType(
-  MigrationConfigPropertiesProperties.targetNamespace,
-  armResourceIdentifier,
-  "csharp"
-);
+@@clientName(NetworkRuleSetProperties.trustedServiceAccessEnabled, "IsTrustedServiceAccessEnabled", "csharp");
+@@clientName(CheckNameAvailabilityResult.nameAvailable, "IsNameAvailable", "csharp");
+@@clientName(MigrationConfigPropertiesProperties.targetNamespace, "TargetServiceBusNamespace", "csharp");
+@@alternateType(MigrationConfigPropertiesProperties.targetNamespace, armResourceIdentifier, "csharp");
 @@alternateType(Identity.tenantId, uuid, "csharp");
 @@alternateType(KeyVaultProperties.keyVaultUri, url, "csharp");
-@@alternateType(
-  SBNamespace.identity,
-  Azure.ResourceManager.CommonTypes.ManagedServiceIdentity,
-  "csharp"
-);
-@@alternateType(
-  SBNamespaceUpdateParameters.identity,
-  Azure.ResourceManager.CommonTypes.ManagedServiceIdentity,
-  "csharp"
-);
+@@alternateType(SBNamespace.identity, Azure.ResourceManager.CommonTypes.ManagedServiceIdentity, "csharp");
+@@alternateType(SBNamespaceUpdateParameters.identity, Azure.ResourceManager.CommonTypes.ManagedServiceIdentity, "csharp");
 
 // Step 6: Avoid Windows filename collision between FailOverProperties.cs and FailoverProperties.cs
 @@clientName(FailOverProperties, "ServiceBusFailOverDetail", "csharp");
 
 // Step 6: Fix property names (MembersMustExist)
 @@clientName(NetworkRuleSetProperties.ipRules, "IPRules", "csharp");
-@@clientName(
-  PrivateEndpointConnectionProperties.privateLinkServiceConnectionState,
-  "ConnectionState",
-  "csharp"
-);
-@@clientName(
-  PrivateEndpointConnection,
-  "ServiceBusPrivateEndpointConnection",
-  "csharp"
-);
+@@clientName(PrivateEndpointConnectionProperties.privateLinkServiceConnectionState, "ConnectionState", "csharp");
+@@clientName(PrivateEndpointConnection, "ServiceBusPrivateEndpointConnection", "csharp");
 @@clientName(NamespaceFailoverProperties, "FailoverProperties", "csharp");
 
 // Step 6: Fix property types to ResourceIdentifier (MembersMustExist)
@@ -308,77 +146,51 @@ using Microsoft.ServiceBus;
 @@alternateType(SBAuthorizationRule.location, azureLocation, "csharp");
 
 // Step 6: Fix operation names (MembersMustExist)
-@@clientName(
-  NamespacesOperationGroup.checkNameAvailability,
-  "CheckServiceBusNamespaceNameAvailability",
-  "csharp"
-);
-@@clientName(
-  SBNamespaces.checkNameAvailability,
-  "CheckServiceBusDisasterRecoveryNameAvailability",
-  "csharp"
-);
+@@clientName(NamespacesOperationGroup.checkNameAvailability, "CheckServiceBusNamespaceNameAvailability", "csharp");
+@@clientName(SBNamespaces.checkNameAvailability, "CheckServiceBusDisasterRecoveryNameAvailability", "csharp");
 
 // =============================================================================
-// C# SDK backward-compatibility replacement models
+// SDK backward-compatibility replacement models
 // =============================================================================
-
 namespace Microsoft.ServiceBus {
-  /**
-   * Parameters supplied to the Patch Namespace operation.
-   */
+  /** Parameters supplied to the Patch Namespace operation. */
   #suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "C# back-compat"
   #suppress "@azure-tools/typespec-azure-core/casing-style" "SB prefix matches existing ServiceBus naming convention"
-  model SBNamespaceUpdateParametersReplacement
-    extends Azure.ResourceManager.CommonTypes.TrackedResource {
+  model SBNamespaceUpdateParametersReplacement extends Azure.ResourceManager.CommonTypes.TrackedResource {
     /** The namespace update properties. */
     properties?: SBNamespaceUpdateProperties;
-
-    ...OmitProperties<
-      SBNamespaceUpdateParameters,
-      "location" | "tags" | "properties" | "id" | "name" | "type" | "systemData"
-    >;
+    ...OmitProperties<SBNamespaceUpdateParameters, "location" | "tags" | "properties" | "id" | "name" | "type" | "systemData">;
   }
 
-  /**
-   * A private link resource
-   */
+  /** A private link resource */
   #suppress "@azure-tools/typespec-azure-core/composition-over-inheritance" "C# back-compat"
-  model PrivateLinkResourceReplacement
-    extends Azure.ResourceManager.CommonTypes.Resource {
+  model PrivateLinkResourceReplacement extends Azure.ResourceManager.CommonTypes.Resource {
     /** The private link resource properties. */
     properties?: PrivateLinkResourceProperties;
   }
+
+  /** Namespace replication properties with the legacy Go SDK field. */
+  model NamespaceReplicaLocationGo {
+    ...NamespaceReplicaLocation;
+    /** ARM ID of the cluster where the namespace replica is maintained. */
+    clusterArmId?: string;
+  }
 } // namespace Microsoft.ServiceBus
 
-@@alternateType(
-  SBNamespaceUpdateParameters,
-  SBNamespaceUpdateParametersReplacement,
-  "csharp"
-);
-@@clientName(
-  SBNamespaceUpdateParametersReplacement,
-  "ServiceBusNamespacePatch",
-  "csharp"
-);
-@@usage(
-  SBNamespaceUpdateParametersReplacement,
-  Usage.input | Usage.output,
-  "csharp"
-);
+@@alternateType(SBNamespaceUpdateParameters, SBNamespaceUpdateParametersReplacement, "csharp");
+@@clientName(SBNamespaceUpdateParametersReplacement, "ServiceBusNamespacePatch", "csharp");
+@@usage(SBNamespaceUpdateParametersReplacement, Usage.input | Usage.output, "csharp");
 #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Back compatibility"
-@@Azure.ClientGenerator.Core.Legacy.flattenProperty(
-  SBNamespaceUpdateParametersReplacement.properties
-);
+@@Azure.ClientGenerator.Core.Legacy.flattenProperty(SBNamespaceUpdateParametersReplacement.properties);
 
 @@alternateType(PrivateLinkResource, PrivateLinkResourceReplacement, "csharp");
-@@clientName(
-  PrivateLinkResourceReplacement,
-  "ServiceBusPrivateLinkResource",
-  "csharp"
-);
+@@clientName(PrivateLinkResourceReplacement, "ServiceBusPrivateLinkResource", "csharp");
 @@usage(PrivateLinkResourceReplacement, Usage.input | Usage.output, "csharp");
 #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Back compatibility"
-@@Azure.ClientGenerator.Core.Legacy.flattenProperty(
-  PrivateLinkResourceReplacement.properties
-);
+@@Azure.ClientGenerator.Core.Legacy.flattenProperty(PrivateLinkResourceReplacement.properties);
+
+@@alternateType(NamespaceReplicaLocation, NamespaceReplicaLocationGo, "go");
+@@clientName(NamespaceReplicaLocation, "NamespaceReplicaLocationGenerated", "go");
+@@clientName(NamespaceReplicaLocationGo, "NamespaceReplicaLocation", "go");
+@@clientName(NamespaceReplicaLocationGo.clusterArmId, "ClusterArmID", "go");
+@@usage(NamespaceReplicaLocationGo, Usage.input | Usage.output, "go");
