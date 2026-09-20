@@ -7,6 +7,9 @@ using Azure.Core;
 using Microsoft.SignalRService;
 using Http;
 
+@@clientName(WebPubSubResource, "ResourceInfo", "go");
+@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
+
 @@clientName(
   Microsoft.SignalRService,
   "WebPubSubManagementClient",

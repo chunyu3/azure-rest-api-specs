@@ -14,11 +14,14 @@ using Microsoft.ServiceBus;
   "java,javascript"
 );
 
-// Fix TLS version naming changes for Go SDK compatibility
+// Preserve TLS version names for SDK compatibility.
 @@clientName(TlsVersion.`1.0`, "ONE0", "python");
 @@clientName(TlsVersion.`1.1`, "ONE1", "python");
 @@clientName(TlsVersion.`1.2`, "ONE2", "python");
 @@clientName(TlsVersion.`1.3`, "ONE3", "python");
+@@clientName(TlsVersion.`1.0`, "One0", "go");
+@@clientName(TlsVersion.`1.1`, "One1", "go");
+@@clientName(TlsVersion.`1.2`, "One2", "go");
 
 @@clientName(ErrorAdditionalInfo, "ServiceBusErrorAdditionalInfo", "csharp");
 @@clientName(UnavailableReason, "ServiceBusNameUnavailableReason", "csharp");
@@ -349,6 +352,14 @@ namespace Microsoft.ServiceBus {
     /** The private link resource properties. */
     properties?: PrivateLinkResourceProperties;
   }
+
+  /** Namespace replication properties retained for Go SDK compatibility. */
+  model NamespaceReplicaLocationGo {
+    ...NamespaceReplicaLocation;
+
+    /** ARM ID of the cluster where the namespace replica is maintained. */
+    clusterArmId?: string;
+  }
 } // namespace Microsoft.ServiceBus
 
 @@alternateType(
@@ -382,3 +393,16 @@ namespace Microsoft.ServiceBus {
 @@Azure.ClientGenerator.Core.Legacy.flattenProperty(
   PrivateLinkResourceReplacement.properties
 );
+
+@@clientName(
+  NamespaceReplicaLocation,
+  "NamespaceReplicaLocationGenerated",
+  "go"
+);
+@@alternateType(
+  NamespaceReplicaLocation,
+  NamespaceReplicaLocationGo,
+  "go"
+);
+@@clientName(NamespaceReplicaLocationGo, "NamespaceReplicaLocation", "go");
+@@usage(NamespaceReplicaLocationGo, Usage.input | Usage.output, "go");
