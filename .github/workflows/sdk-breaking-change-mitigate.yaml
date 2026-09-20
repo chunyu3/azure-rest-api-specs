@@ -98,6 +98,24 @@ jobs:
             core.setOutput("sdk-language", sdkLanguage);
             core.setOutput("trigger-comment-id", triggerCommentId);
 
+      - name: Mark mitigation in progress
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const command = context.payload.comment.body.split(/\r?\n/, 1)[0].trim();
+            try {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+                body: `${command}\n\nMitigating SDK breaking changes ...`,
+              });
+            } catch (error) {
+              if (error.status !== 403) throw error;
+              core.warning("The workflow token cannot update the trigger comment with mitigation status.");
+            }
+
       - name: Find analysis results from pull request comment
         if: steps.resolve-trigger.outputs.should-run == 'true'
         id: find-analysis-results
@@ -383,9 +401,6 @@ jobs:
         id: commit-changes
         shell: bash
         working-directory: repositories/azure-rest-api-specs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SOURCE_REPOSITORY: ${{ steps.resolve-pr-source.outputs.repository }}
         run: |
           set -euo pipefail
           if [[ -z "$(git status --porcelain)" ]]; then
@@ -401,11 +416,40 @@ jobs:
           git add --all
           git commit -m "Mitigate SDK breaking changes"
 
-          authorization="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w 0)"
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $authorization" \
-            push "https://github.com/$SOURCE_REPOSITORY.git" "HEAD:refs/heads/$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
           echo "has-changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create remote mitigation branch
+        if: steps.commit-changes.outputs.has-changes == 'true'
+        uses: actions/github-script@v9
+        env:
+          SOURCE_REPOSITORY: ${{ steps.resolve-pr-source.outputs.repository }}
+          SOURCE_REF: ${{ steps.resolve-pr-source.outputs.ref }}
+          MITIGATION_BRANCH: ${{ steps.commit-changes.outputs.branch }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const [owner, repo] = process.env.SOURCE_REPOSITORY.split("/");
+            await github.rest.git.createRef({
+              owner,
+              repo,
+              ref: `refs/heads/${process.env.MITIGATION_BRANCH}`,
+              sha: process.env.SOURCE_REF,
+            });
+
+      - name: Push mitigation changes
+        if: steps.commit-changes.outputs.has-changes == 'true'
+        shell: bash
+        working-directory: repositories/azure-rest-api-specs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SOURCE_REPOSITORY: ${{ steps.resolve-pr-source.outputs.repository }}
+          MITIGATION_BRANCH: ${{ steps.commit-changes.outputs.branch }}
+        run: |
+          set -euo pipefail
+          authorization="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w 0)"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $authorization" \
+            push "https://github.com/$SOURCE_REPOSITORY.git" "HEAD:refs/heads/$MITIGATION_BRANCH"
 
       - name: Create mitigation pull request
         if: steps.commit-changes.outputs.has-changes == 'true'
