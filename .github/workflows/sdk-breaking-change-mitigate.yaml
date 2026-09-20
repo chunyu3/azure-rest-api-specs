@@ -405,6 +405,7 @@ jobs:
         shell: bash
         working-directory: repositories/azure-rest-api-specs
         env:
+          PR_NUMBER: ${{ steps.resolve-trigger.outputs.pull-number || steps.read-trigger.outputs.pull-number }}
           SDK_LANGUAGE: ${{ steps.resolve-trigger.outputs.sdk-language || steps.read-trigger.outputs.sdk-language }}
         run: |
           set -euo pipefail
@@ -415,7 +416,7 @@ jobs:
           fi
 
           sdk_language="$(tr '[:upper:]' '[:lower:]' <<< "$SDK_LANGUAGE" | sed 's/[^a-z0-9-]/-/g')"
-          branch="sdk-breaking-change-mitigation-${sdk_language}-${GITHUB_RUN_ID}"
+          branch="sdk-breaking-change-mitigation-pr-${PR_NUMBER}-${sdk_language}-${GITHUB_RUN_ID}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
