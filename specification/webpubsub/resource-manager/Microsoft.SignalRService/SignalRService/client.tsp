@@ -13,6 +13,11 @@ using Http;
   "javascript,python"
 );
 
+@@clientName(WebPubSubResource, "ResourceInfo", "go");
+@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
+@@clientName(ResourceSku.familiyNew, "Family", "go");
+@@clientName(ResourceSku.tierNew, "Tier", "go");
+
 @@clientDoc(
   Microsoft.SignalRService.EventHandler.urlTemplate,
   """
