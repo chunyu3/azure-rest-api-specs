@@ -2,7 +2,7 @@ name: SDK Breaking Change Analysis
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -31,7 +31,25 @@ jobs:
       (github.event_name == 'issue_comment' &&
       github.event.issue.pull_request != null &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
-      startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis '))
+      startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis'))
+    concurrency:
+      group: >-
+        sdk-breaking-analysis-${{ github.event.issue.number || inputs.pr_number }}-${{
+        inputs.sdk_language ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis javascript') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis typescript') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis dotnet') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis csharp') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis .net') && 'DotNet') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis cpp') && 'Cpp') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis java') && 'Java') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis python') && 'Python') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis rust') && 'Rust') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis go') && 'Go') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis js') && 'JavaScript') ||
+        (startsWith(github.event.comment.body, '/azsdk sdk-breaking-analysis ts') && 'JavaScript') ||
+        'unknown' }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     env:
       AZSDK_CLI_PATH: /tmp/bin
@@ -72,7 +90,8 @@ jobs:
               sdkLanguageInput = process.env.SDK_LANGUAGE_INPUT;
               tspConfigPath = process.env.TSP_CONFIG_PATH_INPUT;
             } else {
-              const parts = process.env.TRIGGER_COMMENT.trim().split(/\s+/);
+              const command = process.env.TRIGGER_COMMENT.split(/\r?\n/, 1)[0].trim();
+              const parts = command.split(/\s+/);
               if (
                 parts.length !== 3 ||
                 parts[0] !== "/azsdk" ||
@@ -139,6 +158,44 @@ jobs:
             core.setOutput("tsp-config-path", tspConfigPath ?? "");
             core.setOutput("changed-typespec-files", JSON.stringify(changedTypespecFiles));
 
+      - name: Verify pull request was not updated after the trigger
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          EXPECTED_SHA: ${{ steps.resolve-source.outputs.ref }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const pullNumber = Number(process.env.PR_NUMBER);
+            const { data: pull } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: pullNumber,
+            });
+            if (pull.head.sha !== process.env.EXPECTED_SHA) {
+              throw new Error(
+                `The pull request head changed from ${process.env.EXPECTED_SHA} to ${pull.head.sha}. Skip this analysis.`,
+              );
+            }
+
+      - name: Mark analysis in progress
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const command = context.payload.comment.body.split(/\r?\n/, 1)[0].trim();
+            try {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+                body: `${command}\n\nAnalyzing ...`,
+              });
+            } catch (error) {
+              if (error.status !== 403) throw error;
+              core.warning("The workflow token cannot update the trigger comment with analysis status.");
+            }
+
       - name: Checkout specification PR source
         uses: actions/checkout@v7
         with:
@@ -194,9 +251,13 @@ jobs:
             fi
           done
 
-          tsp_config_paths_json="$(jq -cn --args '$ARGS.positional' -- "${tsp_config_paths[@]}")"
-          relative_paths_json="$(jq -cn --argjson paths "$tsp_config_paths_json" --arg prefix "$SPEC_REPOSITORY_PATH/" '$paths | map(ltrimstr($prefix))')"
-          echo "paths=$relative_paths_json" >> "$GITHUB_OUTPUT"
+          typespec_project_paths=()
+          for tsp_config_path in "${tsp_config_paths[@]}"; do
+            typespec_project_paths+=("${tsp_config_path%/tspconfig.yaml}")
+          done
+          typespec_project_paths_json="$(jq -cn --args '$ARGS.positional' -- "${typespec_project_paths[@]}")"
+          relative_project_paths_json="$(jq -cn --argjson paths "$typespec_project_paths_json" --arg prefix "$SPEC_REPOSITORY_PATH/" '$paths | map(ltrimstr($prefix))')"
+          echo "project-paths=$relative_project_paths_json" >> "$GITHUB_OUTPUT"
 
       - name: Checkout target SDK repository
         uses: actions/checkout@v7
@@ -218,6 +279,20 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
+
+      - name: Set up Python
+        if: steps.resolve-source.outputs.sdk-language == 'Python'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Set up Python SDK environment
+        if: steps.resolve-source.outputs.sdk-language == 'Python'
+        shell: bash
+        working-directory: repositories/${{ steps.resolve-source.outputs.sdk-repository }}
+        run: |
+          python -m pip install -U pip > /dev/null
+          python -m pip install 'eng/tools/azure-sdk-tools[ghtools]' > /dev/null
 
       - name: Install golangci-lint
         if: steps.resolve-source.outputs.sdk-language == 'Go'
@@ -266,41 +341,52 @@ jobs:
             --yes
 
       - name: Analyze SDK projects
+        id: analyze-sdk-projects
         shell: bash
         env:
           AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
           AZSDK_COPILOT_GITHUB_TOKEN: ${{ github.token }}
           LOCAL_SDK_REPO_PATH: ${{ github.workspace }}/repositories/${{ steps.resolve-source.outputs.sdk-repository }}
           SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
-          TSP_CONFIG_PATHS: ${{ steps.resolve-tsp-config.outputs.paths }}
+          TYPESPEC_PROJECT_PATHS: ${{ steps.resolve-tsp-config.outputs.project-paths }}
         run: |
-          set -euo pipefail
+          set -Eeuo pipefail
           results_dir="$RUNNER_TEMP/sdk-breaking-change-results"
           mkdir -p "$results_dir"
+          analysis_log="$results_dir/analysis.log"
+          exec > >(tee "$analysis_log") 2>&1
+          trap 'status=$?; printf "Analysis failed with exit code %s.\n" "$status" > "$results_dir/error.log"; exit "$status"' ERR
+          jq -cn \
+            --argjson pullNumber '${{ github.event.issue.number || inputs.pr_number }}' \
+            --arg sdkLanguage '${{ steps.resolve-source.outputs.sdk-language }}' \
+            --arg triggerCommentId '${{ github.event.comment.id }}' \
+            '{pullNumber: $pullNumber, sdkLanguage: $sdkLanguage, triggerCommentId: $triggerCommentId}' \
+            > "$results_dir/trigger.json"
           manifest_jsonl="$results_dir/projects.jsonl"
           : > "$manifest_jsonl"
           echo '[]' > "$results_dir/projects.json"
-          mapfile -t tsp_config_paths < <(jq -r '.[]' <<< "$TSP_CONFIG_PATHS")
+          mapfile -t typespec_project_paths < <(jq -r '.[]' <<< "$TYPESPEC_PROJECT_PATHS")
+          declare -A package_names=()
+          project_number=0
 
-          for index in "${!tsp_config_paths[@]}"; do
-            relative_tsp_config_path="${tsp_config_paths[$index]}"
-            tsp_config_path="$SPEC_REPOSITORY_PATH/$relative_tsp_config_path"
+          for index in "${!typespec_project_paths[@]}"; do
+            typespec_project_path="${typespec_project_paths[$index]}"
+            tsp_config_path="$SPEC_REPOSITORY_PATH/$typespec_project_path/tspconfig.yaml"
             project_number="$((index + 1))"
-            project_results="$results_dir/project-$project_number"
-            marker="$RUNNER_TEMP/azsdk-generation-started-$project_number"
-            mkdir -p "$project_results"
+            marker="$RUNNER_TEMP/azsdk-generation-started"
+            generation_result="$RUNNER_TEMP/sdk-generation-result.json"
             touch "$marker"
 
             azsdk package generate \
               --local-sdk-repo-path "$LOCAL_SDK_REPO_PATH" \
               --tsp-config-path "$tsp_config_path" \
-              --output json | tee "$project_results/generate.json"
+              --output json | tee "$generation_result"
 
             mapfile -d '' generated_configs < <(
               find "$LOCAL_SDK_REPO_PATH" -type f -name tsp-location.yaml -newer "$marker" -print0
             )
             if [[ ${#generated_configs[@]} -ne 1 ]]; then
-              echo "Expected exactly one generated tsp-location.yaml for $relative_tsp_config_path, found ${#generated_configs[@]}." >&2
+              echo "Expected exactly one generated tsp-location.yaml for $typespec_project_path, found ${#generated_configs[@]}." >&2
               printf '  %s\n' "${generated_configs[@]}" >&2
               exit 1
             fi
@@ -310,6 +396,16 @@ jobs:
               echo "Invalid generated package path: $package_path" >&2
               exit 1
             fi
+            package_name="$(basename "$package_path")"
+            if [[ -n "${package_names[$package_name]:-}" ]]; then
+              relative_results_path="$package_name-$project_number"
+            else
+              relative_results_path="$package_name"
+            fi
+            package_names["$package_name"]=1
+            project_results="$results_dir/$relative_results_path"
+            mkdir -p "$project_results"
+            mv "$generation_result" "$project_results/generate.json"
 
             azsdk package build \
               --package-path "$package_path" \
@@ -321,9 +417,10 @@ jobs:
               --output json | tee "$project_results/breaking-changes.json"
 
             jq -cn \
-              --arg tspConfigPath "$relative_tsp_config_path" \
-              --arg resultsPath "$project_results" \
-              '{tspConfigPath: $tspConfigPath, resultsPath: $resultsPath}' \
+              --arg typespecProjectPath "$typespec_project_path" \
+              --arg packageName "$package_name" \
+              --arg resultsPath "$relative_results_path" \
+              '{typespecProjectPath: $typespecProjectPath, packageName: $packageName, resultsPath: $resultsPath}' \
               >> "$manifest_jsonl"
             jq -s '.' "$manifest_jsonl" > "$results_dir/projects.json"
           done
@@ -333,16 +430,42 @@ jobs:
       - name: Publish result summary
         if: always()
         shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
+          ANALYZED_SHA: ${{ steps.resolve-source.outputs.ref }}
+          JOB_LOG_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
         run: |
           {
             echo "## SDK breaking-change analysis"
             echo
-            manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
-            if [[ -f "$manifest" ]]; then
+            if [[ -n "$ANALYZED_SHA" ]]; then
+              printf '%s\n\n' "**Analyzed commit:** \`$ANALYZED_SHA\`"
+            fi
+            if [[ "$JOB_STATUS" == "failure" ]]; then
+              echo "Breaking change analysis failed."
+              echo
+              analysis_log="$RUNNER_TEMP/sdk-breaking-change-results/analysis.log"
+              if [[ "$ANALYSIS_OUTCOME" == "failure" && -f "$analysis_log" ]]; then
+                echo "### Error"
+                echo
+                tail -n 30 "$analysis_log" | sed 's/^/    /'
+                echo
+              else
+                echo "Error output is available in the failed step log."
+                echo
+              fi
+              echo "[See failed step]($JOB_LOG_URL)"
+            else
+              manifest="$RUNNER_TEMP/sdk-breaking-change-results/projects.json"
+              if [[ -f "$manifest" ]]; then
               while IFS= read -r project; do
-                tsp_config_path="$(jq -r '.tspConfigPath' <<< "$project")"
-                results_path="$(jq -r '.resultsPath' <<< "$project")"
-                echo "### $tsp_config_path"
+                typespec_project_path="$(jq -r '.typespecProjectPath' <<< "$project")"
+                package_name="$(jq -r '.packageName' <<< "$project")"
+                results_path="$RUNNER_TEMP/sdk-breaking-change-results/$(jq -r '.resultsPath' <<< "$project")"
+                echo "### $typespec_project_path"
+                echo
+                echo "**SDK Package:** $package_name"
                 echo
                 for result in generate.json build.json breaking-changes.json; do
                   path="$results_path/$result"
@@ -354,6 +477,7 @@ jobs:
                   fi
                 done
               done < <(jq -c '.[]' "$manifest")
+              fi
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -367,46 +491,107 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      - name: Surface SDK breaking changes on pull request
-        if: success()
+      - name: Check analysis freshness
+        if: always() && steps.resolve-source.outputs.ref != ''
+        id: check-analysis-freshness
         uses: actions/github-script@v9
         env:
-          ARTIFACT_URL: ${{ steps.upload-results.outputs.artifact-url }}
+          PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
+          ANALYZED_SHA: ${{ steps.resolve-source.outputs.ref }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const pullNumber = Number(process.env.PR_NUMBER);
+            const analyzedSha = process.env.ANALYZED_SHA;
+            const { data: pull } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: pullNumber,
+            });
+            const isCurrent = pull.head.sha === analyzedSha;
+            core.setOutput("is-current", String(isCurrent));
+            if (!isCurrent) {
+              core.warning(
+                `Analysis result for ${analyzedSha} is stale; current PR head is ${pull.head.sha}.`,
+              );
+              await core.summary
+                .addRaw(
+                  [
+                    "",
+                    "> [!WARNING]",
+                    `> This result is stale. The analyzed commit was \`${analyzedSha}\`, but the current PR head is \`${pull.head.sha}\`. It was not published to the pull request.`,
+                  ].join("\n"),
+                )
+                .write();
+            }
+
+      - name: Surface SDK breaking changes on pull request
+        if: success() && steps.check-analysis-freshness.outputs.is-current == 'true'
+        uses: actions/github-script@v9
+        env:
+          WORKFLOW_SUMMARY_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#summary-${{ job.check_run_id }}
           MANIFEST_PATH: ${{ runner.temp }}/sdk-breaking-change-results/projects.json
+          RESULTS_PATH: ${{ runner.temp }}/sdk-breaking-change-results
           PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
           SDK_LANGUAGE: ${{ steps.resolve-source.outputs.sdk-language }}
+          ANALYZED_SHA: ${{ steps.resolve-source.outputs.ref }}
           TRIGGER_NAME: ${{ github.event_name }}
         with:
+          github-token: ${{ github.token }}
           script: |
             const fs = await import("node:fs/promises");
             const pullNumber = Number(process.env.PR_NUMBER);
             const projects = JSON.parse(await fs.readFile(process.env.MANIFEST_PATH, "utf8"));
             const projectReports = await Promise.all(
               projects.map(async (project) => {
-                const resultPath = `${project.resultsPath}/breaking-changes.json`;
+                const resultPath = `${process.env.RESULTS_PATH}/${project.resultsPath}/breaking-changes.json`;
                 const response = JSON.parse(await fs.readFile(resultPath, "utf8"));
                 const changes = response?.result?.breakingChanges ?? [];
-                const checkboxes = changes.length
-                  ? changes.map((change) => {
-                      const text = String(change.breakingChange ?? change)
-                        .trim()
-                        .replaceAll("\r", "")
-                        .replaceAll("\n", "\n  ");
-                      return `- [ ] ${text}`;
-                    })
-                  : ["- [x] No SDK breaking changes detected."];
-                return [`### ${project.tspConfigPath}`, "", ...checkboxes];
+                const escapeTableCell = (value, fallback = "-") => {
+                  const text = String(value ?? "").trim();
+                  return text
+                    ? text.replaceAll("\r", "").replaceAll("|", "\\|").replaceAll("\n", "<br>")
+                    : fallback;
+                };
+                const changeDetails = changes.map((change) => {
+                  const details = typeof change === "object" && change !== null ? change : {};
+                  const text = escapeTableCell(details.breakingChange ?? change);
+                  const category = escapeTableCell(details.category);
+                  const suggestedFix = escapeTableCell(details.resolution);
+                  return { text, category, suggestedFix };
+                });
+                const tableRows = changeDetails.length
+                  ? changeDetails.map(
+                      ({ text, category, suggestedFix }) =>
+                        `| ☐ | ${text} | ${category} | ${suggestedFix} |`,
+                    )
+                  : [
+                      "| ☐ | No SDK breaking changes detected. | - | - |",
+                    ];
+                const projectReport = [
+                  `**Typespec Project:** ${project.typespecProjectPath}`,
+                  "",
+                  `**SDK Package:** ${project.packageName}`,
+                  "",
+                  "|  | Breaking change | Category | Suggested fix |",
+                  "| --- | --- | --- | --- |",
+                  ...tableRows,
+                ];
+                if (process.env.WORKFLOW_SUMMARY_URL) {
+                  projectReport.push(
+                    "",
+                    `[SDK breaking change details (${project.resultsPath}/breaking-changes.json)](${process.env.WORKFLOW_SUMMARY_URL})`,
+                  );
+                }
+                return projectReport;
               }),
             );
 
-            if (!process.env.ARTIFACT_URL) {
-              throw new Error("SDK breaking-change result artifact URL was not produced.");
-            }
             const report = [
               `## SDK Breaking changes for ${process.env.SDK_LANGUAGE}`,
               "",
+              `**Analyzed commit:** \`${process.env.ANALYZED_SHA}\``,
+              "",
               ...projectReports.flatMap((projectReport) => [...projectReport, ""]),
-              `[SDK breaking change details](${process.env.ARTIFACT_URL})`,
             ].join("\n");
 
             if (process.env.TRIGGER_NAME === "issue_comment") {
@@ -414,12 +599,12 @@ jobs:
                 ...context.repo,
                 comment_id: context.payload.comment.id,
               });
-              const originalBody = comment.body.trimEnd();
+              const command = comment.body.split(/\r?\n/, 1)[0].trim();
               try {
                 await github.rest.issues.updateComment({
                   ...context.repo,
                   comment_id: context.payload.comment.id,
-                  body: `${originalBody}\n\n${report}`,
+                  body: `${command}\n\n${report}`,
                 });
                 return;
               } catch (error) {
@@ -434,4 +619,73 @@ jobs:
               ...context.repo,
               issue_number: pullNumber,
               body: report,
+            });
+
+      - name: Report breaking-change analysis failure
+        if: >-
+          failure() &&
+          (steps.resolve-source.outputs.ref == '' ||
+          steps.check-analysis-freshness.outputs.is-current == 'true')
+        uses: actions/github-script@v9
+        env:
+          PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
+          TRIGGER_NAME: ${{ github.event_name }}
+          ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
+          ANALYZED_SHA: ${{ steps.resolve-source.outputs.ref }}
+          RESULTS_PATH: ${{ runner.temp }}/sdk-breaking-change-results
+          JOB_LOG_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = await import("node:fs/promises");
+            let errorDetails = "";
+            if (process.env.ANALYSIS_OUTCOME === "failure") {
+              try {
+                const analysisLog = await fs.readFile(
+                  `${process.env.RESULTS_PATH}/analysis.log`,
+                  "utf8",
+                );
+                errorDetails = analysisLog
+                  .trim()
+                  .split(/\r?\n/)
+                  .slice(-30)
+                  .map((line) => `    ${line}`)
+                  .join("\n");
+              } catch (error) {
+                core.warning(`Unable to read the analysis error log: ${error.message}`);
+              }
+            }
+            const failureReport = [
+              "> [!CAUTION]\n> Breaking change analysis failed",
+              process.env.ANALYZED_SHA && `\n**Analyzed commit:** \`${process.env.ANALYZED_SHA}\``,
+              errorDetails && `\n${errorDetails}`,
+              `\n[See failed step](${process.env.JOB_LOG_URL})`,
+            ]
+              .filter(Boolean)
+              .join("\n");
+            if (process.env.TRIGGER_NAME === "issue_comment") {
+              try {
+                const { data: comment } = await github.rest.issues.getComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                });
+                const command = comment.body.split(/\r?\n/, 1)[0].trim();
+                await github.rest.issues.updateComment({
+                  ...context.repo,
+                  comment_id: context.payload.comment.id,
+                  body: `${command}\n\n${failureReport}`,
+                });
+                return;
+              } catch (error) {
+                if (![403, 404].includes(error.status)) throw error;
+                core.warning(
+                  "The workflow token cannot read or edit the trigger comment; posting the failure as a new PR comment instead.",
+                );
+              }
+            }
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body: failureReport,
             });
