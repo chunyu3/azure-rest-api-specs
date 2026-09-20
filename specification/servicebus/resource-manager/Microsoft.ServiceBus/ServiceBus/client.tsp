@@ -14,11 +14,14 @@ using Microsoft.ServiceBus;
   "java,javascript"
 );
 
-// Fix TLS version naming changes for Go SDK compatibility
+// Fix TLS version naming changes for SDK compatibility
 @@clientName(TlsVersion.`1.0`, "ONE0", "python");
 @@clientName(TlsVersion.`1.1`, "ONE1", "python");
 @@clientName(TlsVersion.`1.2`, "ONE2", "python");
 @@clientName(TlsVersion.`1.3`, "ONE3", "python");
+@@clientName(TlsVersion.`1.0`, "One0", "go");
+@@clientName(TlsVersion.`1.1`, "One1", "go");
+@@clientName(TlsVersion.`1.2`, "One2", "go");
 
 @@clientName(ErrorAdditionalInfo, "ServiceBusErrorAdditionalInfo", "csharp");
 @@clientName(UnavailableReason, "ServiceBusNameUnavailableReason", "csharp");
