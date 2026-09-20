@@ -290,7 +290,7 @@ jobs:
 
       - name: Install specification repository dependencies
         if: steps.resolve-trigger.outputs.should-run == 'true'
-        run: npm ci
+        run: pnpm ci
         working-directory: repositories/azure-rest-api-specs
 
       - name: Resolve target SDK repository
