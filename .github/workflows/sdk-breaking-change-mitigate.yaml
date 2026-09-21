@@ -16,10 +16,10 @@ on:
 
 permissions:
   actions: read
-  contents: read
+  contents: write
   copilot-requests: write
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   mitigate:
@@ -628,18 +628,11 @@ jobs:
               }
             }
 
-            try {
-              await github.rest.issues.createComment({
-                ...context.repo,
-                issue_number: pullNumber,
-                body: report,
-              });
-            } catch (error) {
-              if (error.status !== 403) throw error;
-              core.warning(
-                "The workflow token cannot post the mitigation result; the result remains available in the workflow summary.",
-              );
-            }
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pullNumber,
+              body: report,
+            });
 
       - name: Report breaking-change mitigation failure
         if: failure()
