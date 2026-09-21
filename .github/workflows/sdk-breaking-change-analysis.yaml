@@ -19,6 +19,7 @@ on:
         type: string
 
 permissions:
+  actions: write
   contents: read
   copilot-requests: write
   issues: write
@@ -667,6 +668,17 @@ jobs:
                 body: command,
               }));
             }
+
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: "sdk-breaking-change-mitigate.yaml",
+              ref: context.payload.repository.default_branch,
+              inputs: {
+                pr_number: String(pullNumber),
+                sdk_language: sdkLanguage,
+                trigger_comment_id: String(comment.id),
+              },
+            });
 
       - name: Report breaking-change analysis failure
         if: >-

@@ -13,6 +13,10 @@ on:
         description: "SDK language"
         required: true
         type: string
+      trigger_comment_id:
+        description: "Pull request comment to update with mitigation status and results"
+        required: false
+        type: string
 
 permissions:
   actions: read
@@ -68,6 +72,7 @@ jobs:
                 throw new Error(`Invalid pull request number: ${context.payload.inputs.pr_number}`);
               }
               sdkLanguage = context.payload.inputs.sdk_language?.trim() ?? "";
+              triggerCommentId = context.payload.inputs.trigger_comment_id?.trim() ?? "";
               core.setOutput("should-run", "true");
             } else if (context.eventName === "issue_comment") {
               const command = context.payload.comment.body.toLowerCase();
@@ -92,16 +97,23 @@ jobs:
             core.setOutput("trigger-comment-id", triggerCommentId);
 
       - name: Mark mitigation in progress
-        if: github.event_name == 'issue_comment'
+        if: steps.resolve-trigger.outputs.trigger-comment-id != ''
         uses: actions/github-script@v9
+        env:
+          TRIGGER_COMMENT_ID: ${{ steps.resolve-trigger.outputs.trigger-comment-id }}
         with:
           github-token: ${{ github.token }}
           script: |
-            const command = context.payload.comment.body.split(/\r?\n/, 1)[0].trim();
+            const triggerCommentId = Number(process.env.TRIGGER_COMMENT_ID);
             try {
+              const { data: comment } = await github.rest.issues.getComment({
+                ...context.repo,
+                comment_id: triggerCommentId,
+              });
+              const command = comment.body.split(/\r?\n/, 1)[0].trim();
               await github.rest.issues.updateComment({
                 ...context.repo,
-                comment_id: context.payload.comment.id,
+                comment_id: triggerCommentId,
                 body: `${command}\n\nMitigating SDK breaking changes ...`,
               });
             } catch (error) {
