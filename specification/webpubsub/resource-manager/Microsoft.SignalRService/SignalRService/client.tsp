@@ -89,8 +89,6 @@ using Http;
   "csharp"
 );
 
-@@clientName(WebPubSubResource, "ResourceInfo", "go");
-@@clientName(WebPubSubResourceList, "ResourceInfoList", "go");
 @@clientName(WebPubSubResource, "WebPubSub", "csharp");
 @@clientName(WebPubSubProperties.disableAadAuth, "IsAadAuthDisabled", "csharp");
 @@clientName(
