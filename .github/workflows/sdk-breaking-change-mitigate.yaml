@@ -628,11 +628,18 @@ jobs:
               }
             }
 
-            await github.rest.issues.createComment({
-              ...context.repo,
-              issue_number: pullNumber,
-              body: report,
-            });
+            try {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: pullNumber,
+                body: report,
+              });
+            } catch (error) {
+              if (error.status !== 403) throw error;
+              core.warning(
+                "The workflow token cannot post the mitigation result; the result remains available in the workflow summary.",
+              );
+            }
 
       - name: Report breaking-change mitigation failure
         if: failure()
