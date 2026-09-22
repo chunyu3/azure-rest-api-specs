@@ -11,7 +11,11 @@ const RawProjectSchema = z.object({
 const RawBreakingChangeSchema = z.object({
   breakingChange: z.string(),
   category: z.string().optional().default(""),
-  resolution: z.string().optional().default(""),
+  resolution: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((value) => value ?? ""),
 });
 
 export const AnalysisResultSchema = z.object({
