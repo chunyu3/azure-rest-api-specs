@@ -116,21 +116,4 @@ describe("resolveChangedTypeSpecProjects", () => {
       '["specification/service/Widget.Service/tspconfig.yaml"]',
     );
   });
-
-  it("uses an explicit config path without listing pull request files", async () => {
-    const repositoryPath = createRepository();
-    const github = createMockGithub();
-    const core = createMockCore();
-    vi.stubEnv("PR_NUMBER", "42");
-    vi.stubEnv("SPEC_REPOSITORY_PATH", repositoryPath);
-    vi.stubEnv("TSP_CONFIG_PATH_INPUT", "specification/other/Other.Service/tspconfig.yaml");
-
-    await expect(
-      resolveChangedTypeSpecProjects({
-        github,
-        context: createMockContext(),
-        core,
-      }),
-    ).resolves.toEqual(["specification/other/Other.Service/tspconfig.yaml"]);
-  });
 });

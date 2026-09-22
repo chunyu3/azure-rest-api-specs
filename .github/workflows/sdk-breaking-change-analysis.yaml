@@ -14,10 +14,6 @@ on:
         description: "SDK language: Cpp, DotNet, Go, Java, JavaScript, Python, or Rust"
         required: true
         type: string
-      tsp_config_path:
-        description: "Repository-relative path to tspconfig.yaml under specification/"
-        required: true
-        type: string
 
 permissions:
   actions: write
@@ -127,8 +123,6 @@ jobs:
         env:
           PR_NUMBER: ${{ needs.resolve-trigger.outputs.pr-number }}
           SDK_LANGUAGE_INPUT: ${{ needs.resolve-trigger.outputs.sdk-language }}
-          TSP_CONFIG_PATH_INPUT: ${{ inputs.tsp_config_path }}
-          TRIGGER_NAME: ${{ github.event_name }}
           TRIGGER_SHA: ${{ needs.resolve-trigger.outputs.head-sha }}
         with:
           script: |
@@ -142,28 +136,15 @@ jobs:
             });
 
             const sdkLanguageInput = process.env.SDK_LANGUAGE_INPUT;
-            let tspConfigPath = process.env.TSP_CONFIG_PATH_INPUT;
 
             const { resolveSdkLanguageConfig } =
               await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/resolve-analysis-inputs.ts');
             const languageConfig = resolveSdkLanguageConfig(sdkLanguageInput);
 
-            if (process.env.TRIGGER_NAME === "workflow_dispatch") {
-              tspConfigPath = tspConfigPath?.trim().replaceAll("\\", "/");
-              if (
-                !tspConfigPath?.startsWith("specification/") ||
-                !tspConfigPath.endsWith("/tspconfig.yaml") ||
-                tspConfigPath.split("/").includes("..")
-              ) {
-                throw new Error(`Invalid TypeSpec config path: ${tspConfigPath}`);
-              }
-            }
-
             core.setOutput("repository", pull.head.repo.full_name);
             core.setOutput("sha", process.env.TRIGGER_SHA || pull.head.sha);
             core.setOutput("sdk-repository", languageConfig.repository);
             core.setOutput("sdk-language", languageConfig.language);
-            core.setOutput("tsp-config-path", tspConfigPath ?? "");
 
       - name: Checkout specification PR source
         uses: actions/checkout@v7
@@ -179,7 +160,6 @@ jobs:
         env:
           PR_NUMBER: ${{ needs.resolve-trigger.outputs.pr-number }}
           SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
-          TSP_CONFIG_PATH_INPUT: ${{ steps.resolve-source.outputs.tsp-config-path }}
         with:
           script: |
             const { resolveChangedTypeSpecProjects } =

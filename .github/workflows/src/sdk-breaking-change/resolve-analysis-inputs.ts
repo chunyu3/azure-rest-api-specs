@@ -99,20 +99,14 @@ export async function resolveChangedTypeSpecProjects({
     throw new Error("SPEC_REPOSITORY_PATH is required.");
   }
 
-  const explicitConfigPath = process.env.TSP_CONFIG_PATH_INPUT?.trim();
-  let changedFiles: string[];
-  if (explicitConfigPath) {
-    changedFiles = [explicitConfigPath];
-  } else {
-    const files: PullRequestFile[] = await github.paginate(github.rest.pulls.listFiles, {
-      ...context.repo,
-      pull_number: pullNumber,
-      per_page: 100,
-    });
-    changedFiles = files.flatMap(({ filename, previous_filename }) =>
-      [filename, previous_filename].filter((path): path is string => path !== undefined),
-    );
-  }
+  const files: PullRequestFile[] = await github.paginate(github.rest.pulls.listFiles, {
+    ...context.repo,
+    pull_number: pullNumber,
+    per_page: 100,
+  });
+  const changedFiles = files.flatMap(({ filename, previous_filename }) =>
+    [filename, previous_filename].filter((path): path is string => path !== undefined),
+  );
   const configPaths = resolveChangedTypeSpecConfigPaths(repositoryPath, changedFiles);
 
   if (configPaths.length === 0) {
