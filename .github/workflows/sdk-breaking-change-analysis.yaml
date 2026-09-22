@@ -112,6 +112,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install dependencies for github-script actions
+        uses: ./.github/actions/install-deps-github-script
+
       - name: Install Azure SDK CLI
         shell: pwsh
         run: ./eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
@@ -210,11 +213,6 @@ jobs:
           export PATH="$GO_BIN:$PATH"
           go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.2
           golangci-lint --version
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24.x"
 
       - name: Set up GitHub Copilot CLI
         id: setup-copilot-cli
