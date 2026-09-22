@@ -35,6 +35,11 @@ beforeEach(async () => {
             category: "spec change",
             resolution: "Restore the old shape",
           },
+          {
+            breakingChange: "Property changed",
+            category: "spec change",
+            resolution: null,
+          },
         ],
       },
     }),
@@ -77,6 +82,11 @@ describe("createAnalysisResult", () => {
               breakingChange: "Model changed",
               category: "spec change",
               suggestedFix: "Restore the old shape",
+            },
+            {
+              breakingChange: "Property changed",
+              category: "spec change",
+              suggestedFix: "",
             },
           ],
         },
