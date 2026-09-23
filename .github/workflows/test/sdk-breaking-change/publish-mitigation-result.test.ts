@@ -39,7 +39,6 @@ beforeEach(async () => {
               breakingChange: "Property changed",
               suggestedFix: "Restore the old property",
               isResolved: false,
-              typespecChangesSummary: [],
             },
           ],
         },
@@ -54,7 +53,12 @@ afterEach(async () => {
 
 describe("buildMitigationReport", () => {
   it("builds resolved and unresolved mitigation sections", async () => {
+    const github = createMockGithub();
+    github.rest.pulls.get.mockResolvedValue({ data: { head: { sha: "a".repeat(40) } } });
+
     const { report } = await buildMitigationReport({
+      github,
+      context: createMockContext(),
       core: createMockCore(),
       mitigationResultPath,
       workflowSummaryUrl: "https://github.com/owner/repo/actions/runs/456",
@@ -72,6 +76,7 @@ describe("buildMitigationReport", () => {
 describe("publishMitigationResult", () => {
   it("publishes using the language-specific mitigation command", async () => {
     const github = createMockGithub();
+    github.rest.pulls.get.mockResolvedValue({ data: { head: { sha: "a".repeat(40) } } });
 
     await publishMitigationResult({
       github,

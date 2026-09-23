@@ -16,7 +16,7 @@ type MitigationResult = {
       breakingChange: string;
       suggestedFix: string;
       isResolved: boolean;
-      typespecChangesSummary: string[];
+      typespecChangesSummary?: string[];
     }>;
   }>;
 };
@@ -33,14 +33,15 @@ export async function buildMitigationReport({
   context,
   core,
   mitigationResultPath,
-  workflowMitigationUrl,
+  workflowSummaryUrl,
 }: Pick<AsyncFunctionArguments, "github" | "context" | "core"> & {
   mitigationResultPath: string;
-  workflowMitigationUrl: string;
+  workflowSummaryUrl: string;
 }): Promise<{ report: string; result: MitigationResult }> {
   const result = JSON.parse(await readFile(mitigationResultPath, "utf8")) as MitigationResult;
   if (result.status !== "success") {
-    const errorMessage = result.errorMessage ?? "The SDK breaking-change mitigaition did not succeed.";
+    const errorMessage =
+      result.errorMessage ?? "The SDK breaking-change mitigaition did not succeed.";
     core.warning(errorMessage); // Handle the failure case if needed
     return { report: errorMessage, result };
   }
@@ -58,7 +59,7 @@ export async function buildMitigationReport({
       .filter((change) => change.isResolved)
       .map(
         (change) =>
-          `| ${escapeTableCell(change.breakingChange)} | ${escapeTableCell(change.suggestedFix)} | ${escapeTableCell(change.typespecChangesSummary[0])} |`,
+          `| ${escapeTableCell(change.breakingChange)} | ${escapeTableCell(change.suggestedFix)} | ${escapeTableCell(change.typespecChangesSummary?.[0])} |`,
       );
     const unresolvedChanges = project.breakingChanges
       .filter((change) => !change.isResolved)
@@ -67,9 +68,9 @@ export async function buildMitigationReport({
           `| ${escapeTableCell(change.breakingChange)} | ${escapeTableCell(change.suggestedFix)} |`,
       );
     return [
-      `[View customization code in the workflow summary](${workflowMitigationUrl})`,
+      `**TypeSpec project:** ${project.typespecProject}`,
       "",
-      `**SDK package:** ${project.sdkPackage} ([View customization code in the workflow summary](${workflowMitigationUrl}))`,
+      `**SDK package:** ${project.sdkPackage}`,
       "",
       "**Resolved Breaking Changes:**",
       "",
@@ -103,7 +104,7 @@ export async function buildMitigationReport({
       changedCode
         ? ["````diff", changedCode, "````"].join("\n")
         : "No mitigation changes were produced.",
-      `[View customization code in the workflow summary](${workflowMitigationUrl})`,
+      `[View customization code in the workflow summary](${workflowSummaryUrl})`,
     ].join("\n"),
     result,
   };
@@ -114,17 +115,17 @@ export async function publishMitigationResult({
   context,
   core,
   mitigationResultPath,
-  workflowMitigationUrl,
+  workflowSummaryUrl,
 }: Pick<AsyncFunctionArguments, "github" | "context" | "core"> & {
   mitigationResultPath: string;
-  workflowMitigationUrl: string;
+  workflowSummaryUrl: string;
 }): Promise<void> {
   const buildResult = await buildMitigationReport({
     github,
     context,
     core,
     mitigationResultPath,
-    workflowMitigationUrl,
+    workflowSummaryUrl,
   });
   await publishResultInComment(
     { github, context, core },

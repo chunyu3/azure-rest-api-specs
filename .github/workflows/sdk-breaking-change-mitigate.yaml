@@ -220,12 +220,11 @@ jobs:
                     ($result.success // false) as $isResolved | {
                       breakingChange: ($breakingChange.breakingChange // $breakingChange),
                       suggestedFix: ($breakingChange.suggestedFix // ""),
-                      isResolved: $isResolved,
-                      typespecChangesSummary: if $isResolved then
-                        ($result.TypeSpecChangesSummary // $result.typeSpecChangesSummary // []) |
-                        if type == "array" then . elif . == "" then [] else [.] end
-                      else [] end
-                    }' \
+                      isResolved: $isResolved
+                    } + if $result.typeSpecChangesSummary != null then
+                      {typespecChangesSummary: $result.typeSpecChangesSummary}
+                    else {}
+                    end' \
                     "$mitigation_result"
                 )"
               else
@@ -235,8 +234,7 @@ jobs:
                     '{
                       breakingChange: ($breakingChange.breakingChange // $breakingChange),
                       suggestedFix: ($breakingChange.suggestedFix // ""),
-                      isResolved: false,
-                      typespecChangesSummary: []
+                      isResolved: false
                     }'
                 )"
               fi
