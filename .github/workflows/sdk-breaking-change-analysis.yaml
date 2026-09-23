@@ -64,6 +64,14 @@ jobs:
       AZSDK_CLI_PATH: /tmp/bin
 
     steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github
+            eng
+          persist-credentials: false
+
       - name: Checkout specification PR head
         uses: actions/checkout@v7
         with:
@@ -71,6 +79,7 @@ jobs:
           # resolve-trigger restricts this to the current SHA of a branch in this repository.
           # codeql[actions/untrusted-checkout/critical]
           ref: ${{ needs.resolve.outputs.head-sha }}
+          path: repositories/azure-rest-api-specs
           persist-credentials: false
 
       - name: Install dependencies for github-script actions
@@ -163,7 +172,7 @@ jobs:
           AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
           AZSDK_COPILOT_GITHUB_TOKEN: ${{ github.token }}
           LOCAL_SDK_REPO_PATH: ${{ github.workspace }}/repositories/${{ needs.resolve.outputs.sdk-repository }}
-          SPEC_REPOSITORY_PATH: ${{ github.workspace }}
+          SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
           TYPESPEC_CONFIG_PATHS: ${{ needs.resolve.outputs.tsp-config-paths }}
         run: |
           set -Eeuo pipefail
