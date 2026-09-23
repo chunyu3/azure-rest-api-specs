@@ -22,6 +22,9 @@ permissions:
 
 jobs:
   resolve:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-slim
     outputs:
       head-repository: ${{ steps.resolve.outputs.head-repository }}
