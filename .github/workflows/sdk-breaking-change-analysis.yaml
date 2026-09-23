@@ -71,15 +71,14 @@ jobs:
           # resolve-trigger restricts this to the current SHA of a branch in this repository.
           # codeql[actions/untrusted-checkout/critical]
           ref: ${{ needs.resolve.outputs.head-sha }}
-          path: repositories/azure-rest-api-specs
           persist-credentials: false
 
       - name: Install dependencies for github-script actions
-        uses: ./repositories/azure-rest-api-specs/.github/actions/install-deps-github-script
+        uses: .github/actions/install-deps-github-script
 
       - name: Install Azure SDK CLI
         shell: pwsh
-        run: ./repositories/azure-rest-api-specs/eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
+        run: .github/workflows/src/sdk-breaking-change/eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
 
       - name: Checkout target SDK repository
         uses: actions/checkout@v7
@@ -164,7 +163,7 @@ jobs:
           AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
           AZSDK_COPILOT_GITHUB_TOKEN: ${{ github.token }}
           LOCAL_SDK_REPO_PATH: ${{ github.workspace }}/repositories/${{ needs.resolve.outputs.sdk-repository }}
-          SPEC_REPOSITORY_PATH: ${{ github.workspace }}/repositories/azure-rest-api-specs
+          SPEC_REPOSITORY_PATH: ${{ github.workspace }}
           TYPESPEC_CONFIG_PATHS: ${{ needs.resolve.outputs.tsp-config-paths }}
         run: |
           set -Eeuo pipefail
@@ -313,7 +312,7 @@ jobs:
         with:
           script: |
             const { createAnalysisResult } =
-              await import('${{ github.workspace }}/repositories/azure-rest-api-specs/.github/workflows/src/sdk-breaking-change/create-analysis-result.ts');
+              await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/create-analysis-result.ts');
             await createAnalysisResult({
               resultsPath: process.env.RESULTS_PATH,
               prNumber: Number(process.env.PR_NUMBER),
