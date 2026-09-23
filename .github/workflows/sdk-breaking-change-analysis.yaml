@@ -74,11 +74,11 @@ jobs:
           persist-credentials: false
 
       - name: Install dependencies for github-script actions
-        uses: .github/actions/install-deps-github-script
+        uses: ./.github/actions/install-deps-github-script
 
       - name: Install Azure SDK CLI
         shell: pwsh
-        run: .github/workflows/src/sdk-breaking-change/eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
+        run: ./eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
 
       - name: Checkout target SDK repository
         uses: actions/checkout@v7
