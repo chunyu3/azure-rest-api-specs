@@ -272,7 +272,7 @@ jobs:
         env:
           JOB_STATUS: ${{ job.status }}
           ANALYSIS_OUTCOME: ${{ steps.analyze-sdk-projects.outcome }}
-          ANALYZED_SHA: ${{ steps.resolve-source.outputs.sha }}
+          ANALYZED_SHA: ${{ needs.resolve-trigger.outputs.head-sha }}
           JOB_LOG_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ job.check_run_id }}
         run: |
           {
@@ -321,13 +321,13 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create SDK analysis result artifact
-        if: always() && steps.resolve-source.outputs.sha != ''
+        if: always() && needs.resolve-trigger.outputs.head-sha != ''
         uses: actions/github-script@v9
         env:
           RESULTS_PATH: ${{ runner.temp }}/sdk-breaking-change-results
           PR_NUMBER: ${{ needs.resolve-trigger.outputs.pr-number }}
-          HEAD_SHA: ${{ steps.resolve-source.outputs.sha }}
-          SDK_LANGUAGE: ${{ steps.resolve-source.outputs.sdk-language }}
+          HEAD_SHA: ${{ needs.resolve-trigger.outputs.head-sha }}
+          SDK_LANGUAGE: ${{ needs.resolve-trigger.outputs.sdk-language }}
           ANALYSIS_WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           STATUS: ${{ steps.analyze-sdk-projects.outcome == 'success' && 'success' || 'failure' }}
         with:
