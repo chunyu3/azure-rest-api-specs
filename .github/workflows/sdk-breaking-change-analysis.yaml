@@ -24,9 +24,11 @@ jobs:
   resolve-trigger:
     runs-on: ubuntu-slim
     outputs:
+      head-repository: ${{ steps.resolve.outputs.head-repository }}
       head-sha: ${{ steps.resolve.outputs.head-sha }}
       pr-number: ${{ steps.resolve.outputs.pr-number }}
       sdk-language: ${{ steps.resolve.outputs.sdk-language }}
+      sdk-repository: ${{ steps.resolve.outputs.sdk-repository }}
       should-run: ${{ steps.resolve.outputs.should-run }}
     steps:
       - name: Checkout workflow repository
