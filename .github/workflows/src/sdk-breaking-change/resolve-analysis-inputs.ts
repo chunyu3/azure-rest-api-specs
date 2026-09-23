@@ -100,12 +100,16 @@ export async function resolveAnalysisTrigger({
     throw new Error(`Invalid head-sha artifact: ${headSha}`);
   }
 
+  const language = SDK_LANGUAGES_BY_LABEL.get(labelArtifact.labelName as (typeof SDK_LABELS)[number]);
+  const languageConfig = resolveSdkLanguageConfig(language);
+
   core.setOutput("pr-number", issueNumber);
   core.setOutput("head-sha", headSha);
   core.setOutput(
     "sdk-language",
-    SDK_LANGUAGES_BY_LABEL.get(labelArtifact.labelName as (typeof SDK_LABELS)[number]),
+    language,
   );
+  core.setOutput("sdk-repository", languageConfig.repository);
   core.setOutput("should-run", labelArtifact.labelValue);
 }
 
