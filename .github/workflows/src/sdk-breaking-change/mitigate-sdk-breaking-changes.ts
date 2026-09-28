@@ -170,13 +170,13 @@ export async function mitigateSdkBreakingChanges({
         "2",
         "--output",
         "json",
-      ],
-      {
-        env: {
-          ...process.env,
-          PATH: `${azureSdkCliPath}${delimiter}${process.env.PATH ?? ""}`,
-        },
-      },
+      ]
+    //   {
+    //     env: {
+    //       ...process.env,
+    //       PATH: `${azureSdkCliPath}${delimiter}${process.env.PATH ?? ""}`,
+    //     },
+    //   },
     );
       await writeFile(commandResultPath, stdout);
     //   const succeeded = await runCommand({
