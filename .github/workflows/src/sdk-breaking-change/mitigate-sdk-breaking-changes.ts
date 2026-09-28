@@ -152,7 +152,7 @@ export async function mitigateSdkBreakingChanges({
       );
       const commandResultPath = join(runnerTemp, `sdk-mitigation-result-${changeIndex}.json`);
       /* Run the mitigation command */
-      const {stdout} = await execFile(`"azsdk"`, [
+      const {stdout, stderr} = await execFile("azsdk", [
         "typespec",
         "client",
         "customized-update",
