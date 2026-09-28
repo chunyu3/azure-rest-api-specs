@@ -11,9 +11,15 @@ const execFileImpl = promisify(child_process.execFile);
 export interface ExecOptions {
   /** Current working directory. Defaults to process.cwd(). */
   cwd?: string;
+  env?: NodeJS.ProcessEnv;
   logger?: import("./logger.ts").ILogger;
   /** Maximum stdout or stderr size in bytes. Defaults to 16 MiB. */
   maxBuffer?: number;
+}
+
+export interface ExecFileOptions extends ExecOptions {
+  /** Maximum execution time in milliseconds. Defaults to no timeout. */
+  timeout?: number;
 }
 
 export interface NpmPrefixOptions {
@@ -47,11 +53,12 @@ export function isExecError(error: unknown): error is ExecError {
 export async function execFile(
   file: string,
   args?: string[],
-  options: ExecOptions = {},
+  options: ExecFileOptions = {},
 ): Promise<ExecResult> {
   const {
     cwd,
     logger,
+    timeout,
     // Node default is 1024 * 1024, which is too small for some git commands returning many entities or large file content.
     // To support "git show", should be larger than the largest swagger file in the repo (2.5 MB as of 2/28/2025).
     maxBuffer = 16 * 1024 * 1024,
@@ -64,6 +71,7 @@ export async function execFile(
     const result = await execFileImpl(file, args, {
       cwd,
       maxBuffer,
+      timeout,
     });
 
     logger?.debug(`stdout: '${result.stdout}'`);
@@ -91,7 +99,7 @@ const nodeBinSchema = z.object({
 export async function execNodeBin(
   packageName: string,
   [binary, ...args]: [string, ...string[]],
-  options: ExecOptions = {},
+  options: ExecFileOptions = {},
 ): Promise<ExecResult> {
   const base = pathToFileURL(resolve(options.cwd ?? process.cwd(), "__resolve__.mjs"));
   const packageJsonPath = findPackageJSON(packageName, base);
