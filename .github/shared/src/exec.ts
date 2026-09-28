@@ -11,6 +11,7 @@ const execFileImpl = promisify(child_process.execFile);
 export interface ExecOptions {
   /** Current working directory. Defaults to process.cwd(). */
   cwd?: string;
+  env?: NodeJS.ProcessEnv;
   logger?: import("./logger.ts").ILogger;
   /** Maximum stdout or stderr size in bytes. Defaults to 16 MiB. */
   maxBuffer?: number;
