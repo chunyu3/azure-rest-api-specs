@@ -101,26 +101,26 @@ jobs:
           persist-credentials: false
 
       - name: Set up Go
-        if: toLower(needs.resolve.outputs.sdk-language) == 'go'
+        if: needs.resolve.outputs.sdk-language == 'Go'
         uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
           cache: false
 
       - name: Set up .NET
-        if: toLower(needs.resolve.outputs.sdk-language) == 'dotnet'
+        if: needs.resolve.outputs.sdk-language == 'DotNet'
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
 
       - name: Set up Python
-        if: toLower(needs.resolve.outputs.sdk-language) == 'python'
+        if: needs.resolve.outputs.sdk-language == 'Python'
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
       - name: Set up Python SDK environment
-        if: toLower(needs.resolve.outputs.sdk-language) == 'python'
+        if: needs.resolve.outputs.sdk-language == 'Python'
         shell: bash
         working-directory: repositories/${{ needs.resolve.outputs.sdk-repository }}
         run: |
@@ -128,7 +128,7 @@ jobs:
           python -m pip install 'eng/tools/azure-sdk-tools[ghtools]' > /dev/null
 
       - name: Install golangci-lint
-        if: toLower(needs.resolve.outputs.sdk-language) == 'go'
+        if: needs.resolve.outputs.sdk-language == 'Go'
         shell: bash
         run: |
           set -euo pipefail
