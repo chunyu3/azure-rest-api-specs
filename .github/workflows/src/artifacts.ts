@@ -47,15 +47,23 @@ export async function getAzurePipelineArtifact({
   };
   let artifactData = "";
   // Use Node.js fetch with retry to call the API
-  let response = await fetchWithRetry(
-    apiUrl,
-    {
-      method: "GET",
-      headers,
-    },
-    retryOptions,
-  );
-
+  core.info(`Fetching artifact list from URL: ${apiUrl}`);
+  let response: Response;
+  try {
+    response = await fetchWithRetry(
+      apiUrl,
+      {
+        method: "GET",
+        headers,
+      },
+      retryOptions,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    core.error(`Failed to fetch artifact list: ${message}`);
+    return { artifactData };
+  }
+ core.info(`Response received for artifacts list: ${response.status} ${await response.text()}`);
   // If the response is 404, check if we should fallback to the failed artifact
   if (response.status === 404) {
     if (!fallbackToFailedArtifact) {
