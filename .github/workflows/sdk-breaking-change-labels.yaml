@@ -31,7 +31,7 @@ jobs:
           tenant-id: "72f988bf-86f1-41af-91ab-2d7cd011db47"
           allow-no-subscriptions: true
 
-      - if: github.event.repository.name == 'azure-rest-api-specs-pr'
+      - if: github.event.repository.name == 'azure-rest-api-specs'
         name: Get ADO Token via Managed Identity
         run: |
           # Get token for Azure DevOps resource
