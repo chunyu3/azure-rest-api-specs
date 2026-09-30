@@ -156,7 +156,7 @@ export async function fetchFailedArtifact({
   if (!response.ok) {
     throw new Error(`Failed to fetch artifacts: ${response.status}, ${response.statusText}`);
   }
-
+  core.info(`Response received for artifacts list: ${response.status} ${await response.text()}`);
   const listArtifactResponse: ListArtifactsResponse =
     (await response.json()) as ListArtifactsResponse;
   core.info(`Artifacts found: ${JSON.stringify(listArtifactResponse)}`);
