@@ -105,7 +105,7 @@ jobs:
       - name: Upload mitigation status
         uses: actions/upload-artifact@v7
         with:
-          name: sdk-breaking-change-mitigate-status
+          name: sdk-breaking-change-mitigate
           path: ${{ runner.temp }}/sdk-breaking-change-mitigate/run
           if-no-files-found: error
           retention-days: 7
