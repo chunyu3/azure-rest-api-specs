@@ -127,5 +127,5 @@ export async function getLabelAndActionImpl({
   // }
 
   // return { labelName, labelAction, headSha: head_sha, issueNumber: issue_number };
-  return { labelName: "BreakingChange-Go-Sdk", labelAction: LabelAction.Add, headSha: "00850ca596599f280dc140fa4cc14dc613e9192b", issueNumber: 7 };
+  return { labelName: "BreakingChange-Go-Sdk", labelAction: LabelAction.Remove, headSha: "00850ca596599f280dc140fa4cc14dc613e9192b", issueNumber: 7 };
 }
