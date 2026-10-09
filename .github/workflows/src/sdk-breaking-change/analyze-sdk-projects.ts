@@ -21,6 +21,17 @@ export type AnalyzeSdkProjectsOptions = {
   resultDir: string;
 };
 
+const Lang_METADATA_LANG_MAP: Record<string, string> = {
+  "dotnet": "dotnet",
+  ".net": "dotnet",
+  "java": "java",
+  "python": "python",
+  "typescript": "typescript",
+  "js": "typescript",
+  "javascript": "typescript",
+  "go": "go"
+};
+
 function isWithin(parent: string, child: string): boolean {
   const path = relative(parent, child);
   return path !== "" && path !== ".." && !path.startsWith(`..${sep}`) && !isAbsolute(path);
@@ -75,7 +86,8 @@ export async function analyzeSdkProjects({
       await writeFile(generationResult, stdout);
 
       const metadata = await generateTypeSpecMetadata(dirname(configPath));
-      const languageMetadata = metadata.languages[sdkLanguage];
+      console.log(`Metadata for ${typeSpecProjectPath}:`, metadata);
+      const languageMetadata = metadata.languages[Lang_METADATA_LANG_MAP[sdkLanguage.toLowerCase()]];
       if (!languageMetadata || languageMetadata.length === 0) {
         throw new Error(
           `Expected language metadata for ${typeSpecProjectPath} and language ${sdkLanguage}, but none was found.`,
