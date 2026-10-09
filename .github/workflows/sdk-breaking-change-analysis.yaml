@@ -204,6 +204,7 @@ jobs:
           test -x "$copilot_path"
           "$copilot_path" --version
           echo "path=$copilot_path" >> "$GITHUB_OUTPUT"
+          echo "copilot_dir_path=$install_dir/bin/" >> "$GITHUB_OUTPUT"
 
       - name: Set up SDK development environment
         shell: bash
@@ -211,9 +212,10 @@ jobs:
           SDK_REPOSITORY_PATH: ${{ github.workspace }}/repositories/${{ needs.resolve.outputs.sdk-repository }}
           SDK_LANGUAGE: ${{ needs.resolve.outputs.sdk-language }}
           AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
+          AZSDK_COPILOT_CLI_DIR_PATH: ${{ steps.setup-copilot-cli.outputs.copilot_dir_path }}
         run: |
           set -euo pipefail
-          export PATH="$AZSDK_CLI_PATH:$AZSDK_COPILOT_CLI_PATH:$PATH"
+          export PATH="$AZSDK_CLI_PATH:$AZSDK_COPILOT_CLI_DIR_PATH:$PATH"
           azsdk verify setup install \
             --languages "$SDK_LANGUAGE" \
             --package-path "$SDK_REPOSITORY_PATH" \
