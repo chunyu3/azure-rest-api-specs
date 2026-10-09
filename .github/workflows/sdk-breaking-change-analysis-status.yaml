@@ -1,6 +1,6 @@
 name: SDK Breaking Change Analysis - Publish Results
 
-on:
+on: # zizmor: ignore[dangerous-triggers] Only base/default-branch code runs and consumes artifacts from the named workflow.
   workflow_run:
     workflows: ["SDK Breaking Change Analysis - Analyze"]
     types: [completed]
@@ -45,7 +45,7 @@ jobs:
       actions: read
       contents: read
       issues: write
-      pull-requests: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
