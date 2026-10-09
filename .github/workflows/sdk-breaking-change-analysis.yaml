@@ -186,7 +186,6 @@ jobs:
         run: |
           set -euo pipefail
           GO_BIN="$(go env GOPATH)/bin"
-          echo "$GO_BIN" >> "$GITHUB_PATH"
           export PATH="$GO_BIN:$PATH"
           go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.2
           golangci-lint --version
@@ -201,7 +200,6 @@ jobs:
             --global \
             --prefix "$install_dir" \
             @github/copilot
-          echo "$install_dir/bin" >> "$GITHUB_PATH"
           copilot_path="$install_dir/bin/copilot"
           test -x "$copilot_path"
           "$copilot_path" --version
