@@ -210,9 +210,10 @@ jobs:
         env:
           SDK_REPOSITORY_PATH: ${{ github.workspace }}/repositories/${{ needs.resolve.outputs.sdk-repository }}
           SDK_LANGUAGE: ${{ needs.resolve.outputs.sdk-language }}
+          AZSDK_COPILOT_CLI_PATH: ${{ steps.setup-copilot-cli.outputs.path }}
         run: |
           set -euo pipefail
-          export PATH="$AZSDK_CLI_PATH:$PATH"
+          export PATH="$AZSDK_CLI_PATH:$AZSDK_COPILOT_CLI_PATH:$PATH"
           azsdk verify setup install \
             --languages "$SDK_LANGUAGE" \
             --package-path "$SDK_REPOSITORY_PATH" \
