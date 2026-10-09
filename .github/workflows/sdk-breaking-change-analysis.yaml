@@ -135,7 +135,7 @@ jobs:
         uses: ./.github/actions/install-deps-github-script
 
       - name: Set up Node.js and install specification repository dependencies
-        uses: ./repositories/workflow-repository/.github/actions/setup-node-install-deps
+        uses: ./.github/actions/setup-node-install-deps
         with:
           working-directory: repositories/azure-rest-api-specs
 
