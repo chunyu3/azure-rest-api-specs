@@ -1,11 +1,11 @@
 import { appendFile, mkdir, realpath, rename, writeFile } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, sep } from "node:path";
-import { execFile } from "../../../shared/src/exec.ts";
+import { execFile } from "@azure-tools/specs-shared/exec";
 import { SdkLanguage } from "./resolve-analysis-inputs.ts";
 import {
   generateTypeSpecMetadata,
   type TypeSpecMetadata,
-} from "../../../shared/src/typespec-metadata.ts";
+} from "@azure-tools/specs-shared/typespec-metadata";
 import {
   parseAzsdkResponse,
   resolveLanguageKey,
@@ -13,7 +13,7 @@ import {
   type AzsdkBuildResponse,
   type AzsdkDetectBreakingChangeResponse,
   type AzsdkGenerateResponse,
-} from "../../../../eng/tools/spec-gen-sdk-runner/src/index.ts";
+} from "@azure-tools/spec-gen-sdk-runner";
 
 interface ProjectResult {
   typespecProjectPath: string;
