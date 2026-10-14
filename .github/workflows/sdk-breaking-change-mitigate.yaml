@@ -248,7 +248,7 @@ jobs:
         with:
           script: |
             const { publishMitigationSummary } =
-              await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/publish-mitigation-summary.ts');
+              await import('${{ github.workspace }}/repositories/workflow-repository/.github/workflows/src/sdk-breaking-change/publish-mitigation-summary.ts');
             await publishMitigationSummary({
               core,
               prNumber: process.env.PR_NUMBER,
