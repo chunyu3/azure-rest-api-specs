@@ -95,11 +95,6 @@ jobs:
       - name: Install dependencies for github-script actions
         uses: ./repositories/workflow-repository/.github/actions/install-deps-github-script
 
-      - name: Set up Node.js and install specification repository dependencies
-        uses: ./repositories/workflow-repository/.github/actions/setup-node-install-deps
-        with:
-          working-directory: repositories/azure-rest-api-specs
-
       - name: Install Azure SDK CLI
         shell: pwsh
         run: ./repositories/workflow-repository/eng/common/mcp/azure-sdk-mcp.ps1 -InstallDirectory $env:AZSDK_CLI_PATH
@@ -186,6 +181,10 @@ jobs:
           ref: ${{ needs.resolve.outputs.head-sha }}
           path: repositories/azure-rest-api-specs
           persist-credentials: false
+      - name: Set up Node.js and install specification repository dependencies
+        uses: ./repositories/workflow-repository/.github/actions/setup-node-install-deps
+        with:
+          working-directory: repositories/azure-rest-api-specs
       - name: Resolve changed TypeSpec config paths
         if: needs.resolve.outputs.should-run == 'true'
         id: resolve-tsp-config-paths
