@@ -180,8 +180,6 @@ jobs:
           ref: ${{ needs.resolve.outputs.head-sha }}
           path: repositories/azure-rest-api-specs
           persist-credentials: false
-      - name: Set up Node.js and install specification repository dependencies
-        uses: ./.github/actions/setup-node-install-deps
       - name: Resolve changed TypeSpec config paths
         if: needs.resolve.outputs.should-run == 'true'
         id: resolve-tsp-config-paths
