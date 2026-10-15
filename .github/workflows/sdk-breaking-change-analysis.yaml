@@ -94,6 +94,8 @@ jobs:
 
       - name: Install dependencies for github-script actions
         uses: ./repositories/workflow-repository/.github/actions/install-deps-github-script
+        with:
+          working-directory: repositories/workflow-repository
 
       - name: Install Azure SDK CLI
         shell: pwsh
