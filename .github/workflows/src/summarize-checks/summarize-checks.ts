@@ -357,20 +357,6 @@ export async function summarizeChecksImpl(
 
   let labelNames = await getExistingLabels(github, owner, repo, issue_number);
 
-  if (hasSdkBreakingChanges(labelNames)) {
-    const { data: pull } = await github.rest.pulls.get({
-      owner,
-      repo,
-      pull_number: issue_number,
-    });
-    if (pull.head.sha !== head_sha) {
-      core.warning(
-        `Skipping SDK breaking-change summary for stale commit ${head_sha}; current PR head is ${pull.head.sha}.`,
-      );
-      return;
-    }
-  }
-
   const [requiredCheckRuns, fyiCheckRuns, impactAssessment] = await getCheckRunTuple(
     github,
     core,
@@ -432,20 +418,34 @@ export async function summarizeChecksImpl(
     }
   }
 
-  const comments = hasSdkBreakingChanges(labelNames)
-    ? await github.paginate(github.rest.issues.listComments, {
+  let sdkBreakingChangesSummary: string | undefined = undefined;
+  const hasSdkBreakingChange = hasSdkBreakingChanges(labelNames);
+  if (hasSdkBreakingChange) {
+    /* check for stale workflow-run handoff SHA */
+    const { data: pull } = await github.rest.pulls.get({
+      owner,
+      repo,
+      pull_number: issue_number,
+    });
+    if (pull.head.sha !== head_sha) {
+      core.warning(
+        `Skipping SDK breaking-change summary for stale commit ${head_sha}; current PR head is ${pull.head.sha}.`,
+      );
+    } else {
+      const comments = await github.paginate(github.rest.issues.listComments, {
         owner,
         repo,
         issue_number,
         per_page: PER_PAGE_MAX,
-      })
-    : undefined;
-  const sdkBreakingChangesSummary = buildSdkBreakingChangesSummary(
-    labelNames,
-    comments ?? [],
-    head_sha,
-    prUrl,
-  );
+      });
+      sdkBreakingChangesSummary = buildSdkBreakingChangesSummary(
+        labelNames,
+        comments ?? [],
+        head_sha,
+        prUrl,
+      );
+    }
+  }
 
   const [commentBody, automatedChecksMet] = createNextStepsComment(
     core,
@@ -476,7 +476,6 @@ export async function summarizeChecksImpl(
     issue_number,
     commentBody,
     NEXT_STEPS_COMMENT_ID,
-    comments,
   );
 
   // finally, update the "Automated merging requirements met" commit status
