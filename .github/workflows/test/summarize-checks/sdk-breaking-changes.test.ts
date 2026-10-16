@@ -72,7 +72,7 @@ describe("SDK breaking-change summary", () => {
     expect(hasSdkBreakingChanges(labels)).toBe(true);
     expect(summary.split("\n").filter((line) => line.startsWith("| "))).toHaveLength(3);
     expect(summary).not.toContain("| Go |");
-    expect(summary).toContain("| Python | Breaking changes detected; approval required |");
+    expect(summary).toContain("| Python | Breaking changes detected |");
     expect(summary).not.toContain(`href="${prUrl}#issuecomment-1"`);
     expect(summary).not.toContain(`href="${prUrl}#issuecomment-2"`);
     expect(summary).toContain(`href="${prUrl}#issuecomment-3"`);
@@ -129,7 +129,10 @@ describe("SDK breaking-change summary", () => {
     );
     expect(summary).not.toContain("#issuecomment-1");
     expect(summary).toContain("#issuecomment-2");
-    expect(summary).toContain("approval required");
+    expect(summary).toContain("| Go | Breaking changes detected |");
+    expect(summary).toContain(
+      "For accepted breaking changes, request <code>BreakingChange-Go-Sdk-Approved</code> from an authorized reviewer.",
+    );
     expect(summary).toContain("apply any proposed customizations, then rerun SDK validation");
     expect(summary).toContain("do not mean those changes have been applied or validated");
   });
@@ -160,7 +163,7 @@ describe("SDK breaking-change summary", () => {
       workflowUrl,
       summary,
     );
-    const tableHeader = "| Language | Detection / approval | Analysis | Mitigation | Next action |";
+    const tableHeader = "| Language | Status | Analysis | Mitigation | Next action |";
     expect(withoutTable).not.toContain(tableHeader);
     expect(withTable).toContain(summary);
     expect(withTable).toContain(`</h3>\n\n${tableHeader}\n| --- | --- | --- | --- | --- |\n`);

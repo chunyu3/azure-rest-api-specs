@@ -163,5 +163,7 @@ indicate that the PR has been fixed or revalidated, and do not replace required 
 
 ### Approval
 
-SDK owner label `Approved-SdkBreakingChange-<language>` to approve the SDK breaking changes.
+An authorized SDK reviewer applies the `BreakingChange-<language>-Sdk-Approved` label to
+approve breaking changes for that language. The language's row is removed from the
+**Next Steps to Merge** summary when it next refreshes.
 ```

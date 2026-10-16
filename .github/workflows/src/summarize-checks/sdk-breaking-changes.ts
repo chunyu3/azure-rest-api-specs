@@ -58,7 +58,7 @@ export function buildSdkBreakingChangesSummary(
       `For accepted breaking changes, request <code>${repoLabels.breakingChangeApproved}</code> from an authorized reviewer.`;
     rows.push([
       language === "DotNet" ? ".NET" : language,
-      "Breaking changes detected; approval required",
+      "Breaking changes detected",
       analysis ?? "Not available for this commit",
       mitigation ?? "Not available for this commit",
       nextAction,
@@ -70,7 +70,7 @@ export function buildSdkBreakingChangesSummary(
   return [
     "",
     "<h3>SDK Breaking Change detection and mitigation</h3>",
-    table([["Language", "Detection / approval", "Analysis", "Mitigation", "Next action"], ...rows]),
+    table([["Language", "Status", "Analysis", "Mitigation", "Next action"], ...rows]),
     "<p>Mitigation reports contain proposed changes; they do not mean those changes have been applied or validated.</p>",
     "",
   ].join("\n\n");
