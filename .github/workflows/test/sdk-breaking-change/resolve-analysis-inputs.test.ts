@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   resolveAnalysisTrigger,
   resolveChangedTypeSpecConfigPathsFromPullRequest,
-  resolveSdkLanguageConfig,
   validateAnalysisSource,
 } from "../../src/sdk-breaking-change/resolve-analysis-inputs.ts";
 import { createMockContext, createMockCore, createMockGithub } from "../mocks.ts";
@@ -50,7 +49,12 @@ afterEach(async () => {
 });
 
 describe("resolveAnalysisTrigger", () => {
-  it("resolves workflow-run inputs from artifacts", async () => {
+  it.each([
+    ["BreakingChange-Go-Sdk", "Go", "azure-sdk-for-go"],
+    ["BreakingChange-Java-Sdk", "Java", "azure-sdk-for-java"],
+    ["BreakingChange-JavaScript-Sdk", "Js", "azure-sdk-for-js"],
+    ["BreakingChange-Python-Sdk", "Python", "azure-sdk-for-python"],
+  ])("resolves workflow-run inputs from %s artifacts", async (label, language, repository) => {
     const github = createMockGithub();
     const context = createMockContext();
     const core = createMockCore();
@@ -63,7 +67,7 @@ describe("resolveAnalysisTrigger", () => {
         artifacts: [
           { name: "issue-number=42" },
           { name: `head-sha=${"a".repeat(40)}` },
-          { name: "label-BreakingChange-.Net-Sdk=true" },
+          { name: `label-${label}=true` },
         ],
       },
     });
@@ -84,7 +88,8 @@ describe("resolveAnalysisTrigger", () => {
     expect(core.setOutput).toHaveBeenCalledWith("pr-number", "42");
     expect(core.setOutput).toHaveBeenCalledWith("head-repository", "owner/repo");
     expect(core.setOutput).toHaveBeenCalledWith("head-sha", "a".repeat(40));
-    expect(core.setOutput).toHaveBeenCalledWith("sdk-language", "DotNet");
+    expect(core.setOutput).toHaveBeenCalledWith("sdk-language", language);
+    expect(core.setOutput).toHaveBeenCalledWith("sdk-repository", repository);
     expect(core.setOutput).toHaveBeenCalledWith("should-run", "true");
     expect(core.setOutput).not.toHaveBeenCalledWith("tsp-config-paths", expect.anything());
     expect(readFileSync(statusArtifactPath, "utf8")).toBe("true\n");
@@ -231,24 +236,6 @@ describe("resolveAnalysisTrigger", () => {
         statusArtifactPath: createStatusArtifactPath(),
       }),
     ).rejects.toThrow("Pull request head changed");
-  });
-});
-
-describe("resolveSdkLanguageConfig", () => {
-  it.each([
-    [".net", "DotNet", "azure-sdk-for-net"],
-    [" DotNet ", "DotNet", "azure-sdk-for-net"],
-    ["go", "Go", "azure-sdk-for-go"],
-    ["java", "Java", "azure-sdk-for-java"],
-    ["javascript", "JavaScript", "azure-sdk-for-js"],
-    ["js", "JavaScript", "azure-sdk-for-js"],
-    ["python", "Python", "azure-sdk-for-python"],
-  ] as const)("resolves %s", (input, language, repository) => {
-    expect(resolveSdkLanguageConfig(input)).toEqual({ language, repository });
-  });
-
-  it("rejects an unsupported language", () => {
-    expect(() => resolveSdkLanguageConfig("ruby")).toThrow("Unsupported SDK language: ruby");
   });
 });
 
