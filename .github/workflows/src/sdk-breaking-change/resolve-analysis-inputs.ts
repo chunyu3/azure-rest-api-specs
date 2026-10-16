@@ -41,7 +41,7 @@ const SDK_LABELS = [
   "BreakingChange-Python-Sdk",
 ] as const;
 
-const SDK_LANGUAGES_BY_LABEL = new Map<(typeof SDK_LABELS)[number], SdkLanguage>([
+export const SDK_LANGUAGES_BY_LABEL = new Map<(typeof SDK_LABELS)[number], SdkLanguage>([
   ["BreakingChange-.Net-Sdk", SdkLanguage.DotNet],
   ["BreakingChange-Go-Sdk", SdkLanguage.Go],
   ["BreakingChange-Java-Sdk", SdkLanguage.Java],
