@@ -98,5 +98,5 @@ export function getSdkLanguage(repo: SdkName): string {
   if (!language) {
     throw new Error(`Unsupported SDK repository: ${repo}`);
   }
-  return language;
+  return language === "Js" ? "JavaScript" : language === "Net" ? "DotNet" : language;
 }

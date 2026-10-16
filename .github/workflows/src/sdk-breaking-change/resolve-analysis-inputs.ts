@@ -55,7 +55,10 @@ export async function resolveAnalysisTrigger({
       core.setOutput("pr-number", pullNumber);
       core.setOutput("head-repository", pull.head.repo.full_name);
       core.setOutput("head-sha", pull.head.sha);
-      core.setOutput("sdk-language", sdkLanguageInput);
+      core.setOutput(
+        "sdk-language",
+        normalizedSdkLanguage[sdkLanguageInput.toLowerCase()] ?? sdkLanguageInput,
+      );
       core.setOutput("sdk-repository", SdkName[sdkLanguageInput as keyof typeof SdkName]);
       shouldRun = "true";
       return;
@@ -125,8 +128,11 @@ export async function resolveAnalysisTrigger({
       ([, labels]) => labels.breakingChange === labelArtifact.labelName,
     )?.[0];
 
-    const sdkLanguage = getSdkLanguage(repoName as SdkName);
-
+    let sdkLanguage = getSdkLanguage(repoName as SdkName);
+    if (!sdkLanguage) {
+      throw new Error(`Unable to determine SDK language for repository: ${repoName}`);
+    }
+    sdkLanguage = normalizedSdkLanguage[sdkLanguage.toLowerCase()] ?? sdkLanguage;
     core.setOutput("pr-number", issueNumber);
     core.setOutput("head-repository", pull.head.repo.full_name);
     core.setOutput("head-sha", pull.head.sha);
@@ -142,6 +148,17 @@ export async function resolveAnalysisTrigger({
   }
 }
 
+const normalizedSdkLanguage: Record<string, string> = {
+  js: "JavaScript",
+  javascript: "JavaScript",
+  typescript: "JavaScript",
+  python: "Python",
+  java: "Java",
+  net: "DotNet",
+  ".net": "DotNet",
+  csharp: "DotNet",
+  go: "Go",
+};
 export function validateAnalysisSource({
   expectedRepository,
   actualRepository,

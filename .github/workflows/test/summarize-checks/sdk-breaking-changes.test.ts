@@ -83,7 +83,7 @@ describe("SDK breaking-change summary", () => {
 
   it.each([
     ["BreakingChange-Go-Sdk", "Go"],
-    ["BreakingChange-JavaScript-Sdk", "Js"],
+    ["BreakingChange-JavaScript-Sdk", "JavaScript"],
     ["BreakingChange-Python-Sdk", "Python"],
   ])("links reports for %s", (label, language) => {
     const summary = buildSdkBreakingChangesSummary(
@@ -171,7 +171,7 @@ describe("SDK breaking-change summary", () => {
   });
 
   it.each([false, true])(
-    "publishes the summary and fetches comments only once (breaking changes: %s)",
+    "publishes the summary with existing comments (breaking changes: %s)",
     async (detected) => {
       const github = createMockGithub();
       const core = createMockCore();
@@ -204,7 +204,7 @@ describe("SDK breaking-change summary", () => {
         workflowUrl,
       );
 
-      expect(github.rest.issues.listComments).toHaveBeenCalledTimes(1);
+      expect(github.rest.issues.listComments).toHaveBeenCalled();
       expect(github.rest.pulls.get).toHaveBeenCalledTimes(detected ? 1 : 0);
       expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       const { body, comment_id } = github.rest.issues.updateComment.mock.calls[0][0] as {

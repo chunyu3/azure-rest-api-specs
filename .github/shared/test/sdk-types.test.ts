@@ -11,11 +11,11 @@ describe("sdk-types", () => {
   it.each([
     [SdkName.Go, "Go"],
     [SdkName.Java, "Java"],
-    [SdkName.Js, "Js"],
-    [SdkName.Net, "Net"],
+    [SdkName.Js, "JavaScript"],
+    [SdkName.Net, "DotNet"],
     [SdkName.Python, "Python"],
     [SdkName.Rust, "Rust"],
-  ])("returns the SdkName key for %s", (repo, language) => {
+  ])("returns the language name for %s", (repo, language) => {
     expect(getSdkLanguage(repo)).toBe(language);
   });
 
