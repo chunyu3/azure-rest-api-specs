@@ -142,6 +142,7 @@ BreakingChange-Go-Sdk-Approved: &sdk-breaking-change-approvers
   - v-xuto
   - weidongxu-microsoft
   - xirzec
+  - chunyu3
 BreakingChange-Go-Sdk-Suppression-Approved: *sdk-breaking-change-approvers
 BreakingChange-JavaScript-Sdk-Approved: *sdk-breaking-change-approvers
 BreakingChange-JavaScript-Sdk-Suppression-Approved: *sdk-breaking-change-approvers
