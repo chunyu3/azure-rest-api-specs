@@ -221,6 +221,7 @@ jobs:
               );
             }
             await analyzeSdkProjects({
+              core,
               localSdkRepositoryPath: process.env.LOCAL_SDK_REPO_PATH,
               specificationRepositoryPath: process.env.SPEC_REPOSITORY_PATH,
               typeSpecConfigPaths: JSON.parse(typeSpecConfigPaths),
