@@ -151,7 +151,7 @@ export async function analyzeSdkProjects({
         continue;
       }
       blocks.push(
-        `**generate.json:** \n\n\`\`\`\n${escapeMarkdown(JSON.stringify(generateResponse, null, 2))}\n\`\`\``,
+        `**generate.json:** \n\n\`\`\`\n${JSON.stringify(generateResponse, null, 2)}\n\`\`\``,
       );
 
       /* Build the SDK package, skip for Python — interpreted language, no compilation needed */
@@ -178,7 +178,7 @@ export async function analyzeSdkProjects({
           continue;
         }
         blocks.push(
-          `**build.json:** \n\n\`\`\`\n${escapeMarkdown(JSON.stringify(buildResponse, null, 2))}\n\`\`\``,
+          `**build.json:** \n\n\`\`\`\n${JSON.stringify(buildResponse, null, 2)}\n\`\`\``,
         );
       }
 
@@ -218,7 +218,7 @@ export async function analyzeSdkProjects({
       }
       blocks.push(`**Analysis succeeded:**`);
       blocks.push(
-        `**Breaking Changes:**\n\`\`\`\n${escapeMarkdown(JSON.stringify(breakingChangesResponse, null, 2))}\n\`\`\``,
+        `**Breaking Changes:**\n\`\`\`\n${JSON.stringify(breakingChangesResponse, null, 2)}\n\`\`\``,
       );
 
       analyzeResult.projects.push({
@@ -230,12 +230,12 @@ export async function analyzeSdkProjects({
             const typedChange = change as {
               breakingChange: string;
               category: string;
-              resolution: string;
+              resolution?: string;
             };
             return {
               breakingChange: typedChange.breakingChange,
               category: typedChange.category,
-              suggestedFix: typedChange.resolution,
+              suggestedFix: typedChange.resolution ?? "",
             };
           }) ?? [],
       });
