@@ -231,7 +231,7 @@ jobs:
               analyzedSha: process.env.ANALYZED_SHA,
               workflowUrl: process.env.WORKFLOW_URL,
               resultFilePath: `${process.env.RUNNER_TEMP}/sdk-breaking-change-results/sdk-breaking-change-analysis.json`,
-              azureSdkCliPath: process.env.AZSDK_COPILOT_CLI_PATH,
+              azureSdkCliPath: process.env.AZSDK_CLI_PATH,
             });
 
       - name: Upload SDK analysis results
