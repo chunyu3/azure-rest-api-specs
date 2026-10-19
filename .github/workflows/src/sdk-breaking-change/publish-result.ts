@@ -4,7 +4,6 @@ import { readFile } from "node:fs/promises";
 import { escapeMarkdown, table } from "@azure-tools/specs-shared/markdown";
 import { MarkdownHeadingId, type MitigationResult, MitigationResultSchema } from "./types.ts";
 import { publishResultInComment } from "./publish-result-in-comment.ts";
-import { publishMitigationSuggestions } from "./publish-mitigation-suggestions.ts";
 
 const MAX_CHANGED_CODE_LENGTH = 12_000;
 
