@@ -1,5 +1,5 @@
 import type { GitHubScriptArgs } from "../github.ts";
-import path from "node:path";
+import { join } from "node:path";
 import { readFile } from "node:fs/promises";
 import { escapeMarkdown, table } from "@azure-tools/specs-shared/markdown";
 import { MarkdownHeadingId, type MitigationResult, MitigationResultSchema } from "./types.ts";
@@ -17,7 +17,7 @@ export async function buildReport({
   resultDir: string;
   workflowSummaryUrl: string;
 }): Promise<{ report: string; result: MitigationResult }> {
-  const mitigationResultPath = path.join(resultDir, "sdk-breaking-change-mitigation.json");
+  const mitigationResultPath = join(resultDir, "sdk-breaking-change-mitigation.json");
   const result = MitigationResultSchema.parse(
     JSON.parse(await readFile(mitigationResultPath, "utf8")),
   );

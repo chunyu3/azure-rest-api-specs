@@ -69,7 +69,7 @@ jobs:
         id: publish-result
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          MITIGATION_RESULT_PATH: ${{ runner.temp }}/sdk-breaking-change-results/sdk-breaking-change-mitigation.json
+          MITIGATION_RESULT_DIR_PATH: ${{ runner.temp }}/sdk-breaking-change-results
           WORKFLOW_SUMMARY_URL: ${{ github.event.workflow_run.html_url }}
         with:
           github-token: ${{ github.token }}
@@ -80,7 +80,7 @@ jobs:
               github,
               context,
               core,
-              mitigationResultPath: process.env.MITIGATION_RESULT_PATH,
+              resultDir: process.env.MITIGATION_RESULT_DIR_PATH,
               workflowSummaryUrl: process.env.WORKFLOW_SUMMARY_URL,
             });
 
