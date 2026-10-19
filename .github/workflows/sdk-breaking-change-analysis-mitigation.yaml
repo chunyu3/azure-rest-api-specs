@@ -75,7 +75,7 @@ jobs:
       copilot-requests: write
     concurrency:
       group: >-
-        sdk-breaking-analysis-${{ needs.resolve.outputs.pr-number }}-${{
+        sdk-breaking-analysis-mitigation-${{ needs.resolve.outputs.pr-number }}-${{
         needs.resolve.outputs.sdk-language }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
@@ -300,9 +300,9 @@ jobs:
       - name: Publish mitigation summary
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          PR_NUMBER: ${{ needs.resolve-trigger.outputs.pr-number }}
-          SDK_LANGUAGE: ${{ needs.resolve-trigger.outputs.sdk-language }}
-          MITIGATION_COMMIT: ${{ needs.resolve-trigger.outputs.head-sha }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr-number }}
+          SDK_LANGUAGE: ${{ needs.resolve.outputs.sdk-language }}
+          MITIGATION_COMMIT: ${{ needs.resolve.outputs.head-sha }}
           MITIGATION_CHANGED_CODE: ${{ steps.get-changed-code.outputs.changed-code }}
         with:
           script: |
