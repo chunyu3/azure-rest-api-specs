@@ -26,7 +26,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     outputs:
       head-repository: ${{ steps.resolve.outputs.head-repository }}
       head-sha: ${{ steps.resolve.outputs.head-sha }}
@@ -50,20 +50,20 @@ jobs:
         with:
           script: |
             // Resolve the analysis trigger inputs and publish analysis run status.
-            const { resolveAnalysisTrigger } =
-              await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/resolve-analysis-inputs.ts');
-            await resolveAnalysisTrigger({
+            const { resolveInputs } =
+              await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/resolve-inputs.ts');
+            await resolveInputs({
               github,
               context,
               core,
-              statusArtifactPath: "${{ runner.temp }}/sdk-breaking-change-analysis/run",
+              statusArtifactPath: "${{ runner.temp }}/sdk-breaking-change/run",
             });
       - name: Publish analysis status
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: sdk-breaking-change-analysis-status
-          path: ${{ runner.temp }}/sdk-breaking-change-analysis/run
+          name: sdk-breaking-change-status
+          path: ${{ runner.temp }}/sdk-breaking-change/run
           if-no-files-found: error
           retention-days: 7
 
