@@ -230,7 +230,7 @@ jobs:
               sdkRepoName: process.env.SDK_REPO_NAME,
               analyzedSha: process.env.ANALYZED_SHA,
               workflowUrl: process.env.WORKFLOW_URL,
-              resultFilePath: `${process.env.RUNNER_TEMP}/sdk-breaking-change-results/sdk-breaking-change-analysis.json`,
+              resultFilePath: `${process.env.RUNNER_TEMP}/sdk-breaking-change-analysis-results/sdk-breaking-change-analysis.json`,
               azureSdkCliPath: process.env.AZSDK_CLI_PATH,
             });
 
