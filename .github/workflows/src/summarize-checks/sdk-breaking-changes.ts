@@ -67,7 +67,7 @@ export function buildSdkBreakingChangesSummary(
   }
   return [
     "",
-    "<h3>SDK Breaking Change detection and mitigation</h3>",
+    "<h3>SDK Breaking Change Detection and Mitigation</h3>",
     table([["Language", "Status", "Analysis", "Mitigation", "Next action"], ...rows]),
     "<p>💡 Mitigation reports contain proposed changes; they do not mean those changes have been applied or validated.</p>",
     "<p>💡 When suppressing breaking changes, ensure to use the original breaking changes.</p>",

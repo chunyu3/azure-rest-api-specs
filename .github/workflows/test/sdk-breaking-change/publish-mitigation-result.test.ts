@@ -10,6 +10,10 @@ import { createMockContext, createMockCore, createMockGithub } from "../mocks.ts
 let resultsPath: string;
 let mitigationResultPath: string;
 
+const applyGuidance = "<p>💡 Apply the customization code to mitigate the breaking changes.</p>";
+const suppressionGuidance =
+  '<p>💡 For accepted breaking changes, follow the <a href="https://github.com/Azure/azure-rest-api-specs/wiki/SDK-Breaking-Changes#how-to-suppress-the-sdk-breaking-changes">suppression process</a> to suppress them.</p>';
+
 beforeEach(async () => {
   resultsPath = join(import.meta.dirname, `results-${crypto.randomUUID()}`);
   mitigationResultPath = join(resultsPath, "sdk-breaking-change-mitigation.json");
@@ -66,17 +70,21 @@ describe("buildMitigationReport", () => {
       workflowSummaryUrl: "https://github.com/owner/repo/actions/runs/456",
     });
 
+    expect(report).toContain("## SDK Breaking Change Mitigation for Java");
     expect(report).toContain("**TypeSpec project:** specification/service/Widget.Service");
     expect(report).toContain(
-      "| Model changed | Restored compatibility | Added client customization |",
+      "| model-change | Model changed | Restored compatibility | Added client customization |",
     );
-    expect(report).toContain("| Property changed | Restore the old property |");
+    expect(report).toContain("| property-change | Property changed | Restore the old property |");
     expect(report).toContain("````diff\n+customization\n````");
     expect(report).toContain(
       "<details><summary>View customization Code</summary>\n\n````diff\n+customization\n````\n\n</details>",
     );
     expect(report).toContain(
       "<details open><summary>View resolved breaking changes</summary>\n\n| ID | Breaking change | Resolution | TypeSpec changes |",
+    );
+    expect(report).toContain(
+      `[View customization code in the workflow summary](https://github.com/owner/repo/actions/runs/456)\n\n${applyGuidance}\n\n${suppressionGuidance}`,
     );
   });
 
@@ -102,7 +110,45 @@ describe("buildMitigationReport", () => {
 
     expect(report).toContain("No mitigation changes were produced.");
     expect(report).not.toContain("<details>");
+    expect(report).toContain(applyGuidance);
+    expect(report).toContain(suppressionGuidance);
   });
+
+  it.each(["failure", "stale"] as const)(
+    "omits customization and action guidance for a %s result",
+    async (kind) => {
+      const github = createMockGithub();
+      const core = createMockCore();
+      if (kind === "failure") {
+        const artifact = JSON.parse(await readFile(mitigationResultPath, "utf8")) as Record<
+          string,
+          unknown
+        >;
+        await writeFile(
+          mitigationResultPath,
+          JSON.stringify({ ...artifact, status: "failure", errorMessage: "Customization failed" }),
+        );
+      } else {
+        github.rest.pulls.get.mockResolvedValue({ data: { head: { sha: "b".repeat(40) } } });
+      }
+
+      const { report } = await buildMitigationReport({
+        github,
+        context: createMockContext(),
+        core,
+        mitigationResultPath,
+        workflowSummaryUrl: "https://github.com/owner/repo/actions/runs/456",
+      });
+
+      expect(report).toContain(kind === "failure" ? "Customization failed" : "is stale;");
+      expect(report).not.toContain("**Customization Code:**");
+      expect(report).not.toContain("<details");
+      expect(report).not.toContain(applyGuidance);
+      expect(report).not.toContain(suppressionGuidance);
+      expect(core.warning).toHaveBeenCalledOnce();
+      if (kind === "failure") expect(github.rest.pulls.get).not.toHaveBeenCalled();
+    },
+  );
 
   it("includes the full customization code even beyond 12,000 characters", async () => {
     const customizationCode = `+${"a".repeat(12_000)}`;
@@ -196,6 +242,9 @@ describe("publishMitigationResult", () => {
     expect(comment.issue_number).toBe(42);
     expect(comment.body).toMatch(/^\/azsdk sdk-breaking-mitigate Java\n\n/);
     expect(comment.body).toContain(`<!-- sdk-breaking-change-head-sha: ${"a".repeat(40)} -->`);
+    expect(comment.body).toContain("<!-- /azsdk sdk-breaking-mitigate Java -->");
+    expect(comment.body).toContain(applyGuidance);
+    expect(comment.body).toContain(suppressionGuidance);
     expect(core.setOutput).toHaveBeenCalledWith("issue_number", 42);
     expect(core.setOutput).toHaveBeenCalledWith("head_sha", "a".repeat(40));
   });

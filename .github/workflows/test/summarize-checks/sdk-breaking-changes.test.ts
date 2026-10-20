@@ -224,7 +224,7 @@ describe("SDK breaking-change summary", () => {
       };
       expect(comment_id).toBe(99);
       if (detected) {
-        expect(body).toContain("<h3>SDK Breaking Change detection and mitigation</h3>");
+        expect(body).toContain("<h3>SDK Breaking Change Detection and Mitigation</h3>");
         expect(body).toContain(`href="${prUrl}#issuecomment-1"`);
       } else {
         expect(body).not.toContain("<table>");
@@ -275,7 +275,7 @@ describe("SDK breaking-change summary", () => {
     });
     const { body } = github.rest.issues.updateComment.mock.calls[0][0] as { body: string };
     expect(body).toContain("<h2>Next Steps to Merge</h2>");
-    expect(body).not.toContain("SDK Breaking Change detection and mitigation");
+    expect(body).not.toContain("SDK Breaking Change Detection and Mitigation");
     expect(body).not.toContain("#issuecomment-1");
     expect(github.rest.repos.createCommitStatus).toHaveBeenCalledWith(
       expect.objectContaining({ sha: headSha }),

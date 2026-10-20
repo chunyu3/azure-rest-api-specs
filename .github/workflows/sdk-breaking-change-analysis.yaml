@@ -1,4 +1,4 @@
-# cspell:ignore Eeuo ghtools golangci GOPATH ltrimstr
+# cspell:ignore eeuo ghtools golangci GOPATH ltrimstr
 name: SDK Breaking Change Analysis
 
 on: # zizmor: ignore[dangerous-triggers] Only base/default-branch workflow code runs; PR content is checked out separately.
@@ -139,7 +139,7 @@ jobs:
           set -euo pipefail
           GO_BIN="$(go env GOPATH)/bin"
           export PATH="$GO_BIN:$PATH"
-          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.2
+          go install github.com/golangci-lint-lint/golangci-lint@v2.11.2
           golangci-lint --version
 
       - name: Set up GitHub Copilot CLI
@@ -279,3 +279,15 @@ jobs:
             const { publishAnalysisResult } =
               await import('${{ github.workspace }}/.github/workflows/src/sdk-breaking-change/publish-analysis-result.ts');
             await publishAnalysisResult({ github, context, core });
+
+      - name: Upload PR number
+        uses: ./.github/actions/add-empty-artifact
+        with:
+          name: issue-number
+          value: ${{ steps.publish-result.outputs.issue_number }}
+
+      - name: Upload PR head SHA
+        uses: ./.github/actions/add-empty-artifact
+        with:
+          name: head-sha
+          value: ${{ steps.publish-result.outputs.head_sha }}

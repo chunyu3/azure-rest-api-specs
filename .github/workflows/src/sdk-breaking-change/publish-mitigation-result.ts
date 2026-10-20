@@ -98,6 +98,10 @@ export async function buildMitigationReport({
         ? details("View customization Code", ["````diff", changedCode, "````"].join("\n"))
         : "No mitigation changes were produced.",
       `[View customization code in the workflow summary](${workflowSummaryUrl})`,
+      "",
+      "<p>💡 Apply the customization code to mitigate the breaking changes.</p>",
+      "",
+      "<p>💡 For accepted breaking changes, follow the <a href=\"https://github.com/Azure/azure-rest-api-specs/wiki/SDK-Breaking-Changes#how-to-suppress-the-sdk-breaking-changes\">suppression process</a> to suppress them.</p>",
     ].join("\n"),
     result,
   };
