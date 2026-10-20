@@ -2,7 +2,7 @@ name: SDK Breaking Change Mitigation
 
 on: # zizmor: ignore[dangerous-triggers] Only base/default-branch workflow code runs; PR content is checked out separately.
   workflow_run:
-    workflows: ["SDK Breaking Change Analysis - Analyze"]
+    workflows: ["SDK Breaking Change Analysis"]
     types: [completed]
 
 permissions:
