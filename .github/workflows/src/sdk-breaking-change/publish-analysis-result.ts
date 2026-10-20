@@ -30,7 +30,8 @@ export async function buildAnalysisReport(resultsPath: string): Promise<{
       "",
       table([["#", "Breaking change", "Category", "Suggested fix"], ...tableRows]),
     ];
-    projectReport.push("", `[SDK breaking change analysis details](${result.analysisWorkflowUrl})`);
+    const breakingChangeSummaryUrl = [result.analysisWorkflowUrl, "#", "breaking-changes"].join("");
+    projectReport.push("", `[SDK breaking change analysis details](${breakingChangeSummaryUrl})`);
     return projectReport;
   });
 
