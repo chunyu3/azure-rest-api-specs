@@ -267,8 +267,6 @@ jobs:
         with:
           name: sdk-breaking-change-analysis-results
           path: ${{ runner.temp }}/sdk-breaking-change-analysis-results
-          github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Publish SDK breaking-change analysis result
         id: publish-result

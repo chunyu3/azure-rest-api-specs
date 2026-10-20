@@ -227,8 +227,6 @@ jobs:
         with:
           name: sdk-breaking-change-mitigation-results
           path: ${{ runner.temp }}/sdk-breaking-change-mitigation-results
-          github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Publish SDK breaking-change mitigation result
         id: publish-result
