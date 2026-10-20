@@ -46,7 +46,7 @@ jobs:
               github,
               context,
               core,
-              analysisArtifactName: "sdk-breaking-change-results",
+              analysisArtifactName: "sdk-breaking-change-analysis-results",
               analysisStatusArtifactName: "sdk-breaking-change-analysis-status",
               analysisStatusPath: "${{ runner.temp }}/sdk-breaking-change-analysis/run",
               mitigationStatusPath: "${{ runner.temp }}/sdk-breaking-change-mitigate/run",
