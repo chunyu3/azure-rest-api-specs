@@ -176,6 +176,8 @@ jobs:
       - name: Checkout specification PR head
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          sparse-checkout: |
+              specification
           repository: ${{ needs.resolve.outputs.head-repository }}
           ref: ${{ needs.resolve.outputs.head-sha }}
           path: repositories/azure-rest-api-specs
